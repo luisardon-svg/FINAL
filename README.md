@@ -1,4 +1,4 @@
-# 🩺 SaludSeguimiento
+# 🩺 NOMBRE EN PROCESO
 
 > Plataforma web que conecta a pacientes y doctores para dar seguimiento remoto a la salud, relacionando los síntomas actuales con el historial del paciente — **sin necesidad de una cita física**.
 
