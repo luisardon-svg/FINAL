@@ -72,8 +72,8 @@ def calcular_promedio_glucosa(registros):
     for registro in registros:
         suma = suma + registro["valor"]
 
-        promedio = suma / len(registros)
-        return round(promedio, 2)
+    promedio = suma / len(registros)
+    return round(promedio, 2)
 
 # ---------------------------------------------------------------------
 # FUNCIÓN 2: encontrar el valor de glucosa más alto registrado
