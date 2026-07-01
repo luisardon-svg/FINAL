@@ -143,6 +143,49 @@ def generar_alerta(registros):
         return "ALERTA: glucosa promedio elevada. Revisar tratamiento."
     else:
         return "Glucosa promedio dentro de rango."
+    
+# ---------------------------------------------------------------------
+# FUNCIÓN 5: validar un valor de glucosa escrito por el usuario
+# ---------------------------------------------------------------------
+
+def validar_glucosa(valor_texto):
+    """
+    Revisa lo que el usuario escribió al registrar una glucosa nueva.
+    Devuelve un diccionario con dos claves:
+    - "valido": True or False
+    - "mensaje": explicación de por qué es válido o no
+    
+    Demuestra: parámetros , return, condicionales if/elif/else,
+    validación de la entrada del usuario, y manejo de un caso de error.
+    """
+
+    # Límites de lo que consideramos una glucosa humana realista (mg/dL)
+    GLUCOSA_MINIMA = 20
+    GLUCOSA_MAXIMA = 600
+
+    # 1) Que no esté vacío. strip() quita espacios en blanco a los lados;
+    # si al quitarlos no queda nada, el usuario no escribió un valor real.
+
+    if valor_texto is None or valor_texto.strip() == "":
+        return {"valido": False, "mensaje": "El valor no puede estar vacío."}
+    
+    # 2) Que sea un número. Intentamos convertir el texto a número decimal.
+    # Si no puede (por ejemplo escribió "abc"), Python lanza un error
+    # que atrapamos con try/except y devolvemos un mensaje claro.
+
+    try:
+        valor = float(valor_texto)
+    except ValueError:
+        return {"valido": False, "mensaje": "El valor debe ser un número."}
+    
+    # 3) Que esté dentro del rango razonable (20 a 600 mg/dL).
+    if valor < GLUCOSA_MINIMA:
+        return {"valido": False, "mensaje": "El valor es demasiado bajo (mínimo 20)."}
+    elif valor > GLUCOSA_MAXIMA:
+        return {"valido": False, "mensaje": "El valor es demasiado alto (máximo 600)."}
+    else:
+        # Si pasó las tres pruebas, es un valor válido.
+        return {"valido": True, "mensaje": "Valor de glucosa válido."}
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
