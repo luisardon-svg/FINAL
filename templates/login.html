@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Health Monitor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Iniciar Sesión</h2>
+                
+                <form method="POST" action="/login">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="tu@email.com" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Tu contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                
+                <hr>
+                <p class="text-center text-muted small">
+                    <strong>Para prueba:</strong><br>
+                    Paciente: paciente@email.com / 1234<br>
+                    Doctor: doctor@email.com / 1234
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
