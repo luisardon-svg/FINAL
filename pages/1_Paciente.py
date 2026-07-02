@@ -39,3 +39,19 @@ col1, col2, col3 = st.columns(3)
 col1.metric("Promedio", f"{promedio} mg/dL")
 col2.metric("Máximo", f"{maximo} mg/dL")
 col3.metric("Tendencia", tendencia)
+
+# --- SECCIÓN 3: Gráfica de evolución ---
+st.subheader("Evolución de la glucosa")
+
+#Construimos dos listas a partir de los registros, recorriéndolos con un for:
+# una con las fechas (para el eje) y otra con los valores de glucosa.
+
+fechas = []
+valores = []
+for registro in registros:
+    fechas.append(registro["fecha"])
+    valores.append(registro["valor"])
+
+# st.line_chart dibuja la línea. Le pasamos un diccionario donde la clave
+# es el nombre de la serie y el valor es la lista de datos.
+st.line_chart({"Glucosa (mg/dL)": valores})
