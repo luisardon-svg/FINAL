@@ -21,3 +21,21 @@ st.write("Edad:", paciente["edad"], "años")
 st.subheader("Historial médico")
 for condicion in paciente["historial_medico"]:
     st.write("-", condicion)
+
+# --- SECCIÓN 2: Resumen de glucosa (cifras clave) ---
+st.subheader("Resumen de glucosa")
+
+# Sacamos la lista de registros de glucosa del paciente
+registros = paciente["registros_glucosa"]
+
+# Usamos NUESTRAS funciones de logica.py para calcular cada dato
+promedio = logica.calcular_promedio_glucosa(registros)
+maximo = logica.encontrar_glucosa_maxima(registros)
+tendencia = logica.detectar_tendencia(registros)
+
+# st.columns crea columnas para poner las métricas lado a lado
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Promedio", f"{promedio} mg/dL")
+col2.metric("Máximo", f"{maximo} mg/dL")
+col3.metric("Tendencia", tendencia)
