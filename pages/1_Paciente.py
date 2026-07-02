@@ -28,6 +28,15 @@ st.subheader("Resumen de glucosa")
 # Sacamos la lista de registros de glucosa del paciente
 registros = paciente["registros_glucosa"]
 
+# Inicializamos la memoria una sola vez con los registros originales.
+# A partir de aquí, TODO (métricas, gráfica) lee de esta memoria.
+
+if "registros_memoria" not in st.session_state:
+    st.session_state.registros_memoria = list(registros)
+
+# Usamos la memoria como fuente de datos
+registros = st.session_state.registros_memoria  # Reasignamos "registros" para que se almacene en memoria
+
 # Usamos NUESTRAS funciones de logica.py para calcular cada dato
 promedio = logica.calcular_promedio_glucosa(registros)
 maximo = logica.encontrar_glucosa_maxima(registros)
@@ -59,12 +68,6 @@ st.line_chart({"Glucosa (mg/dL)": valores})
 
 # --- SECCIÓN 4: Registrar nueva glucosa (con validación) ---
 st.subheader("Registrar nueva glucosa")
-
-#Incializamos la "memoria" una sola vez: si aún no existe en session_state,
-# la creamos copiando los registros originales del paciente.
-
-if "registros_memoria" not in st.session_state:
-    st.session_state.registros_memoria = list(registros)
 
 
 # Campo de texto para que el usuario escriba el valor
