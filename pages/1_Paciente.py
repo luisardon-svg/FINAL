@@ -55,3 +55,32 @@ for registro in registros:
 # st.line_chart dibuja la línea. Le pasamos un diccionario donde la clave
 # es el nombre de la serie y el valor es la lista de datos.
 st.line_chart({"Glucosa (mg/dL)": valores})
+
+
+# --- SECCIÓN 4: Registrar nueva glucosa (con validación) ---
+st.subheader("Registrar nueva glucosa")
+
+#Incializamos la "memoria" una sola vez: si aún no existe en session_state,
+# la creamos copiando los registros originales del paciente.
+
+if "registros_memoria" not in st.session_state:
+    st.session_state.registros_memoria = list(registros)
+
+
+# Campo de texto para que el usuario escriba el valor
+valor_nuevo = st.text_input("Valor de glucosa (mg/dL)")
+
+#Botón para registrar
+if st.button("Registrar"):
+    #Usamos NUESTRA función validar_glucosa de logica.py
+    resultado = logica.validar_glucosa(valor_nuevo)
+
+    if resultado["valido"]:
+        #Si es válido, lo agregamos a la memoria con la fecha de hoy
+        from datetime import date
+        nuevo_registro = {"fecha": str(date.today()), "valor": float(valor_nuevo)}
+        st.session_state.registros_memoria.append(nuevo_registro)
+        st.success(resultado["mensaje"])
+    else:
+        #Si no es válido, mostramos el mensaje de error de la función
+        st.error(resultado["mensaje"])
