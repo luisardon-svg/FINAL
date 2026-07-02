@@ -45,9 +45,10 @@ tendencia = logica.detectar_tendencia(registros)
 # st.columns crea columnas para poner las métricas lado a lado
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Promedio", f"{promedio} mg/dL")
+col1.metric("Promedio", f"{round(promedio, 2)} mg/dL")
 col2.metric("Máximo", f"{maximo} mg/dL")
 col3.metric("Tendencia", tendencia)
+
 
 # --- SECCIÓN 3: Gráfica de evolución ---
 st.subheader("Evolución de la glucosa")
@@ -81,9 +82,18 @@ if st.button("Registrar"):
     if resultado["valido"]:
         #Si es válido, lo agregamos a la memoria con la fecha de hoy
         from datetime import date
-        nuevo_registro = {"fecha": str(date.today()), "valor": float(valor_nuevo)}
+        nuevo_registro = {"fecha": str(date.today()), "valor": round(float(valor_nuevo), 2)}
         st.session_state.registros_memoria.append(nuevo_registro)
         st.success(resultado["mensaje"])
+        st.rerun() # vuelve a ejecutar todo para que la gráfica y métricas se actualicen
     else:
         #Si no es válido, mostramos el mensaje de error de la función
         st.error(resultado["mensaje"])
+
+
+# --- SECCIÓN 5: Tabla de registros ---
+st.subheader("Historial de registros")
+
+# Mostramos la lista de registros (que vive en la memoria) como tabla.
+# st.table recibe la lista de diccionarios y arma la tabla sola.
+st.table(st.session_state.registros_memoria)
