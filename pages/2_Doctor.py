@@ -27,7 +27,12 @@ st.divider()
 
 #SECCION ": Metricas de glucosa
 # lista de registro de paciente 
-registros = paciente ["registros_glucosa"]
+#LEEMOS la misma memoria de la pag del paciente
+#los registros nuevos también estarán actualizados
+#si paciente aun no ha abierto su pag, iniciamos con registros originales
+if "registros_mempria" not in st.session_state:
+    st.session_state.registros_memoria = list(paciente["registros_glucosa"])
+registros = st.session_state.registros_memoria
 
 #Los tres calculos vienen de funciones de logica.py
 promedio = logica.calcular_promedio_glucosa(registros)
