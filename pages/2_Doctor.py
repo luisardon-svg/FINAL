@@ -30,7 +30,7 @@ st.divider()
 #LEEMOS la misma memoria de la pag del paciente
 #los registros nuevos también estarán actualizados
 #si paciente aun no ha abierto su pag, iniciamos con registros originales
-if "registros_mempria" not in st.session_state:
+if "registros_memoria" not in st.session_state:
     st.session_state.registros_memoria = list(paciente["registros_glucosa"])
 registros = st.session_state.registros_memoria
 
