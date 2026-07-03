@@ -227,3 +227,13 @@ if __name__ == "__main__":
  
     alerta = generar_alerta(registros)
     print("Estado:", alerta)
+
+    # --- Prueba de la validación de datos del usuario ---
+    print()
+    print("=== Prueba de validación de glucosa ===")
+    valores_prueba = ["155", "", "abc", "10", "700"]
+    
+    # Ciclo for: recorremos varios valores de ejemplo y los validamos.
+    for valor in valores_prueba:
+        resultado = validar_glucosa(valor)
+        print("Entrada:", repr(valor), "->", resultado["mensaje"])
