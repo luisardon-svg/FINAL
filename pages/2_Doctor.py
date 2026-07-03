@@ -94,3 +94,25 @@ grafica_final = grafica + limite
 
 st.altair_chart(grafica_final, use_container_width=True)
 st.caption(f"La linea roja marca el limite de {logica.GLUCOSA_LIMITE_ALTA} mg/dL. Las lecturas por encima disparan la alerta.")
+
+st.divider()
+#SECCION 5: decision de doctor
+#Refleja la decision final del profesional
+st.subheader("Decision del doctor")
+#Mostramos sugerencia 
+if "ALERTA" in alerta: 
+    st.info("Sugerencia: revisar y ajustar tratamiento")
+else: 
+    st.info("Sugerencia: continuar con el tratamiento actual")
+
+#El doctor puede redactar su propio analisis
+recomendacion = st.text_area("Escriba su recomendación para el paciente:")
+
+#Al enviar, se confirma la indicación
+if st.button("Enviar indicacion al paciente"):
+    if recomendacion.strip() == "":
+        st.error("Escriba una recomendacion antes de enviar.")
+    else: 
+        st.success("Indicacion enviada al paciente:")
+        st.write(f"**Dra. Mendoza indica:** {recomendacion}")
+
