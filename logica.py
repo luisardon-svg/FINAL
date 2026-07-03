@@ -41,6 +41,15 @@ pacientes_db = {
             {"fecha": "2026-06-26", "valor": 148},
             {"fecha": "2026-06-27", "valor": 160},
             {"fecha": "2026-06-28", "valor": 155},
+            {"fecha": "2026-06-29", "valor": 158},
+            {"fecha": "2026-06-30", "valor": 162},
+            {"fecha": "2026-07-01", "valor": 150},
+            {"fecha": "2026-07-02", "valor": 145},
+            {"fecha": "2026-07-03", "valor": 138},
+            {"fecha": "2026-07-04", "valor": 132},
+            {"fecha": "2026-07-05", "valor": 128},
+            {"fecha": "2026-07-06", "valor": 125},
+            {"fecha": "2026-07-07", "valor": 122},
         ],
         # Otros síntomas que el paciente reporta (contexto extra)
         "otros_sintomas": ["Fatiga leve", "Mareos ocasionales"]
@@ -129,17 +138,20 @@ def detectar_tendencia(registros):
 
 def generar_alerta(registros):
     """
-    Revisa el promedio de glucosa y devuelve un mensaje de alerta para
-    el doctor si supera el límite considerado normal.
- 
-    Demuestra: parámetros, return, condicional, uso de otra función,
-    y una constante. Esta es la lógica que la doctora ve en su panel.
+    Revisa el promedio de glucosa de los registros MÁS RECIENTES (los
+    últimos 5) y devuelve un mensaje de alerta si supera el límite.
+    Usar solo los últimos registros refleja mejor el estado actual del
+    paciente que promediar todo el historial completo.
+
+    Demuestra: parámetros, return, condicional, slicing de listas,
+    y uso de otra función.
     """
-    
-    promedio = calcular_promedio_glucosa(registros)
+    registros_recientes = registros[-5:] #Slicing de listas
+
+    promedio_reciente = calcular_promedio_glucosa(registros_recientes)
 
     # Condicional: comparamos el promedio contra el límite
-    if promedio > GLUCOSA_LIMITE_ALTA:
+    if promedio_reciente > GLUCOSA_LIMITE_ALTA:
         return "ALERTA: glucosa promedio elevada. Revisar tratamiento."
     else:
         return "Glucosa promedio dentro de rango."
