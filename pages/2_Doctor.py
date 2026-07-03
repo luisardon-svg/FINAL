@@ -3,6 +3,7 @@
 
 import streamlit as st
 import logica
+import altair as alt
 
 st.set_page_config(page_title = "Doctor", page_icon = "🩺")
 
@@ -54,4 +55,37 @@ if "ALERTA" in alerta:
     st.error(f"**{alerta}**")
 else: 
     st.success(f"{alerta}")
-    
+
+st.divider()
+
+#SECCION 4: Evolucion de glucosa
+st.subheader("Evolucion de glucosa")
+
+#Lista de datos (fecha + valor) recorriendo los registros con un for
+#altair necesita los datos en ese formaato (igual que en la pagina del paciente). 
+datos_grafica = []
+for registro in registros: 
+    datos_grafica.append({
+        "Fecha": registro["fecha"],
+        "Glucosa": registro["valor"]
+        })
+
+#Linea de evolucion (mismo estilo que la pagina del paciente)
+grafica = alt.Chart(alt.Data(values=datos_grafica)).mark_line(point=True).encode(
+    x=alt.X("Fecha:N", title="Fecha"),
+y=alt.Y("Glucosa:Q", title="Glucosa (mg/dL)",
+            scale=alt.Scale(domain=[100,180]))
+).properties(height=300)
+
+#linea roja del LIMITE (130), reusando la constante de logica.py
+limite = alt.Chart(
+    alt.Data(values=[{"Glucosa": logica.GLUCOSA_LIMITE_ALTA}])
+).mark_rule(color="red", strokeDash=[6,4]).encode(
+    y="Glucosa:Q"
+)
+
+#Superponemos capas
+grafica_final = grafica + limite
+
+st.altair_chart(grafica_final, use_container_width=True)
+st.caption(f"La linea roja marca el limite de {logica.GLUCOSA_LIMITE_ALTA} mg/dL. Las lecturas por encima disparan la alerta.")
