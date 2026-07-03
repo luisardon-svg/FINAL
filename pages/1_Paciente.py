@@ -3,6 +3,7 @@
 
 import streamlit as st
 import logica
+import altair as alt
 
 
 st.set_page_config(page_title = "Paciente", page_icon = "👤")
@@ -51,21 +52,28 @@ col3.metric("Tendencia", tendencia)
 
 
 # --- SECCIÓN 3: Gráfica de evolución ---
+
 st.subheader("Evolución de la glucosa")
 
-#Construimos dos listas a partir de los registros, recorriéndolos con un for:
-# una con las fechas (para el eje) y otra con los valores de glucosa.
+# Armamos una lista de diccionarios (fecha + valor) recorriendo los
+# registros con un for. Altair necesita los datos en este formato
 
-fechas = []
-valores = []
+datos_grafica = []
 for registro in registros:
-    fechas.append(registro["fecha"])
-    valores.append(registro["valor"])
+    datos_grafica.append({
+        "Fecha": registro["fecha"],
+        "Glucosa": registro["valor"]
+    })
 
-# st.line_chart dibuja la línea. Le pasamos un diccionario donde la clave
-# es el nombre de la serie y el valor es la lista de datos.
-st.line_chart({"Glucosa (mg/dL)": valores})
+# Construimos la gráfica de línea con Altair.
+grafica = alt.Chart(alt.Data(values=datos_grafica)).mark_line(point=True).encode(
+    x = alt.X("Fecha:N", title="Fecha"),
+    y = alt.Y("Glucosa:Q", title="Glucosa (mg/dL)",
+              scale=alt.Scale(domain=[100,180]))
+).properties(height=300)
 
+# Mostramos la gráfica en Streamlit, ocupando todo el ancho.
+st.altair_chart(grafica, use_container_width=True)
 
 # --- SECCIÓN 4: Registrar nueva glucosa (con validación) ---
 st.subheader("Registrar nueva glucosa")
@@ -94,6 +102,17 @@ if st.button("Registrar"):
 # --- SECCIÓN 5: Tabla de registros ---
 st.subheader("Historial de registros")
 
-# Mostramos la lista de registros (que vive en la memoria) como tabla.
-# st.table recibe la lista de diccionarios y arma la tabla sola.
-st.table(st.session_state.registros_memoria)
+# Creamos una versión "para mostrar" de los registros, con los valores
+# formateados a exactamente 2 decimales como texto. 
+
+#Recorremos la memoria con un for y armamos una lista nueva, sin 
+# modificar los datos originales guardados en session_state.
+
+registros_para_mostrar = []
+for registro in st.session_state.registros_memoria:
+    registros_para_mostrar.append({
+        "fecha": registro["fecha"],
+        "valor (mg/dL)": f"{registro["valor"]:.2f}"
+    })
+
+st.table(registros_para_mostrar)
