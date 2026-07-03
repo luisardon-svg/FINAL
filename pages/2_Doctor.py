@@ -40,3 +40,18 @@ col1, col2, col3, = st.columns(3)
 col1.metric("Promedio", f"{promedio} mg/dL")
 col2.metric("Maxima", f"{maxima} mg/dL")
 col3.metric("Tendencia", tendencia)
+
+st.divider()
+
+#SECCION #: Alerta
+# generar_alerta (logica.py) decide el mensaje segun el promedio
+alerta = logica.generar_alerta(registros)
+
+st.subheader("Estado del paciente")
+#si el mensaje contiene "ALERTA", lo mostramos en rojo (st.error)
+# si no, en verde (st.success)
+if "ALERTA" in alerta: 
+    st.error(f"**{alerta}**")
+else: 
+    st.success(f"{alerta}")
+    
