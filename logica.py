@@ -35,7 +35,7 @@ pacientes_db = {
         ],
         # Registros de glucosa de los últimos 5 días (en mg/dL).
         # Esta es la métrica principal que analizamos para la demo.
-        
+
         "registros_glucosa": [
             {"fecha": "2026-06-24", "valor": 145},
             {"fecha": "2026-06-25", "valor": 152},
@@ -244,26 +244,25 @@ def validar_glucosa(valor_texto):
 
 def validar_presion_arterial(sistolica, diastolica):
     """
-    Valida una lectura de presión arterial.
-    Recibe sistolica y diastolica como texto o número.
-    Retorna (True, "") si es válida, o (False, "mensaje de error") si no.
+    Revisa una lectura de presión arterial.
+    Devuelve un diccionario con "valido" (bool) y "mensaje" (str).
     """
     try:
         sistolica = int(sistolica)
         diastolica = int(diastolica)
     except (ValueError, TypeError):
-        return False, "La presión arterial debe ser un número entero."
+        return {"valido": False, "mensaje": "La presión arterial debe ser un número entero."}
     
     if sistolica <= diastolica:
-        return False, "La sistolica debe ser mayor que la diastolica."
+        return {"valido": False, "mensaje": "La sistólica debe ser mayor que la diastólica."}
     
     if not (70 <= sistolica <= 200):
-        return False, "La sistolica debe estar entre 70 y 200 mmHg."
+        return {"valido": False, "mensaje": "La sistólica debe estar entre 70 y 200 mmHg."}
     
     if not (40 <= diastolica <= 130):
-        return False, "La diastólica debe estar entre 40 y 130 mmHg."
+        return {"valido": False, "mensaje": "La diastólica debe estar entre 40 y 130 mmHg."}
     
-    return True, ""
+    return {"valido": True, "mensaje": "Presión arterial válida."}
 
 # ---------------------------------------------------------------------
 # FUNCIÓN 7: validación de oxigenación
@@ -271,20 +270,20 @@ def validar_presion_arterial(sistolica, diastolica):
 
 def validar_oxigenacion(spo2):
     """
-    Valida un valor de saturación de oxígeno (SpO2).
-    Recibe spo2 como texto o número.
-    Retorna (True, "") si es válido, o (False, "mensaje de error") si no.
+    Revisa un valor de saturación de oxígeno (SpO2).
+    Devuelve un diccionario con "valido" (bool) y "mensaje" (str).
     """
 
     try:
         spo2 = int(spo2)
     except (ValueError, TypeError):
-        return False, "La oxigenación debe ser un número entero."
+        return {"valido": False, "mensaje": "La oxigenación debe ser un número entero."}
+
 
     if not (70 <= spo2 <= 100):
-        return False, "La oxigenación debe estar entre 70 y 100%. "
+        return {"valido": False, "mensaje": "La oxigenación debe estar entre 70 y 100%."}
 
-    return True, ""
+    return {"valido": True, "mensaje": "Oxigenación válida."}
 
 
 # ---------------------------------------------------------------------
