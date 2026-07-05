@@ -302,6 +302,27 @@ def calcular_estado_semaforo(promedio, tendencia, alerta):
     # VERDE: sin alerta, y estable
     else: 
         return "estable"
+    
+# ---------------------------------------------------------------------
+# FUNCIÓN 9: generar un resumen clínico en texto (versión local)
+# ---------------------------------------------------------------------
+def generar_resumen_clinico (datos_paciente, registros):
+    nombre = datos_paciente["nombre"]
+    edad = datos_paciente["edad"]
+    promedio = calcular_promedio_glucosa(registros)
+    maxima = encontrar_glucosa_maxima(registros)
+    tendencia = detectar_tendencia(registros)
+    alerta = generar_alerta(registros)
+    estado = calcular_estado_semaforo(promedio, tendencia, alerta)
+
+    #construccion resuemn con f-strings
+    resumen = (
+        f"Paciente: {nombre}, {edad} años.\n"
+        f"Glucosa promedio: {promedio} mg/dL (maxima: {maxima} mg/dL). \n"
+        f"Tendencia: {tendencia}. Estado general: {estado}. \n"
+        f"Observacion: {alerta}"
+    )
+    return resumen
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
 # ---------------------------------------------------------------------
@@ -369,3 +390,5 @@ if __name__ == "__main__":
     print(validar_oxigenacion("xyz")) # (False, "debe ser un número entero")
     estado = calcular_estado_semaforo(promedio, tendencia, alerta)
     print("Estado (semaforo):", estado)
+    print("\n--- Resumen clínico ---")
+    print(generar_resumen_clinico(paciente, registros))
