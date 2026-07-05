@@ -445,8 +445,16 @@ def calcular_estado_semaforo(promedio, tendencia, alerta):
 # FUNCIÓN 15: generar un resumen clínico en texto (versión local)
 # ---------------------------------------------------------------------
 def generar_resumen_clinico(datos_paciente, registros):
+    nombre = datos_paciente["nombre"]
+    edad = datos_paciente["edad"]
+
+    promedio = calcular_promedio_glucosa(registros)
+    maxima =encontrar_glucosa_maxima(registros)
+    tendencia = detectar_tendencia(registros)
+    alerta = generar_alerta(registros)
+    estado = calcular_estado_semaforo(promedio, tendencia, alerta)
     resumen = (
-        f"Paciente: {nombre}, edad años"
+        f"Paciente: {nombre}, {edad} años.\n"
         f"Glucosa promedio: {promedio} mg/dL (máxima: {maxima} mg/dL).\n"
         f"Tendencia: {tendencia}. Estado general: {estado}.\n"
         f"Observación: {alerta}"
