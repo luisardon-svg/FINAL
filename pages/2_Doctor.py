@@ -62,7 +62,17 @@ else:
     st.success(f"{alerta}")
 
 st.divider()
+#Semaforo de estado general
+estado = logica.calcular_estado_semaforo(promedio, tendencia, alerta)
 
+st.subheader("Estado general del paciente")
+
+if estado == "alerta":
+    st.error("🔴 ALERTA — requiere atención inmediata")
+elif estado == "atencion":
+    st.warning("🟡 ATENCIÓN — vigilar de cerca")
+else: 
+    st.success("🟢 ESTABLE — dentro de lo esperado")
 #SECCION 4: Evolucion de glucosa
 st.subheader("Evolucion de glucosa")
 
