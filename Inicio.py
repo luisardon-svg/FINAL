@@ -3,7 +3,7 @@
 # Streamlit usa archivo como pag. de inicio; el resto estaran en pages/ y aparecerán en barra lateral
 import streamlit as st #Importamos libreria de stremlit
 import logica #modulo con logica de porgra
-st.set_page_config(page_title="health Monitor", page_icon="⚕️")
+st.set_page_config(page_title="Vital Health Monitor", page_icon="⚕️")
 
 st.title("Health Monitor ⚕️")
 st.write("Plataforma de seguimiento de salud, usa el menu de la izquierda para ingresar con base al tipo de usuario que seas.")

@@ -288,6 +288,147 @@ def validar_oxigenacion(spo2):
 
     return {"valido": True, "mensaje": "Oxigenación válida."}
 
+# ---------------------------------------------------------------------
+# FUNCIÓN 8: promedio de presión sistólica y diastólica
+# ---------------------------------------------------------------------
+def calcular_promedio_presion(registros):
+    """
+    Recibe la lista de registros de presión arterial y devuelve un
+    diccionario con el promedio de la sistólica y de la diastólica.
+ 
+    Demuestra: parámetros, return, ciclo for, condicional, listas, diccionarios.
+    """
+    if len(registros) == 0:
+        return {"sistolica": 0, "diastolica": 0}
+ 
+    suma_sistolica = 0
+    suma_diastolica = 0
+    for registro in registros:
+        suma_sistolica = suma_sistolica + registro["sistolica"]
+        suma_diastolica = suma_diastolica + registro["diastolica"]
+ 
+    promedio_sistolica = suma_sistolica / len(registros)
+    promedio_diastolica = suma_diastolica / len(registros)
+ 
+    return {
+        "sistolica": round(promedio_sistolica, 2),
+        "diastolica": round(promedio_diastolica, 2),
+    }
+ 
+ 
+# ---------------------------------------------------------------------
+# FUNCIÓN 9: registro con la sistólica más alta
+# ---------------------------------------------------------------------
+def encontrar_presion_maxima(registros):
+    """
+    Recorre los registros de presión y devuelve el registro completo
+    (sistólica + diastólica) donde la sistólica fue más alta.
+ 
+    Demuestra: parámetros, return, ciclo while, condicional, listas.
+    """
+    if len(registros) == 0:
+        return {"sistolica": 0, "diastolica": 0}
+ 
+    maximo = registros[0]
+    indice = 1
+    while indice < len(registros):
+        if registros[indice]["sistolica"] > maximo["sistolica"]:
+            maximo = registros[indice]
+        indice = indice + 1
+ 
+    return maximo
+ 
+ 
+# ---------------------------------------------------------------------
+# FUNCIÓN 10: tendencia de la presión sistólica
+# ---------------------------------------------------------------------
+def detectar_tendencia_presion(registros):
+    """
+    Compara la sistólica del primer y el último registro.
+ 
+    Demuestra: parámetros, return, condicionales if/elif/else, listas.
+    """
+    if len(registros) < 2:
+        return "No hay suficientes datos para una tendencia"
+ 
+    primero = registros[0]["sistolica"]
+    ultimo = registros[-1]["sistolica"]
+ 
+    if ultimo > primero:
+        return "Subiendo"
+    elif ultimo < primero:
+        return "Bajando"
+    else:
+        return "Estable"
+ 
+ 
+# ---------------------------------------------------------------------
+# FUNCIÓN 11: alerta de presión arterial elevada
+# ---------------------------------------------------------------------
+PRESION_SISTOLICA_LIMITE = 140
+ 
+def generar_alerta_presion(registros):
+    """
+    Revisa el promedio de la sistólica de los últimos 5 registros
+    y devuelve un mensaje de alerta si supera el límite.
+ 
+    Demuestra: parámetros, return, condicional, slicing, uso de otra función.
+    """
+    registros_recientes = registros[-5:]
+    promedio_reciente = calcular_promedio_presion(registros_recientes)
+ 
+    if promedio_reciente["sistolica"] > PRESION_SISTOLICA_LIMITE:
+        return "ALERTA: presión arterial elevada. Revisar tratamiento."
+    else:
+        return "Presión arterial dentro de rango."
+ 
+ 
+# ---------------------------------------------------------------------
+# FUNCIÓN 12: valor mínimo de oxigenación registrado
+# ---------------------------------------------------------------------
+def encontrar_oxigenacion_minima(registros):
+    """
+    Recorre los registros de oxigenación y devuelve el valor más bajo.
+    A diferencia de la glucosa, aquí lo que importa es el mínimo, no
+    el máximo: una oxigenación baja es la señal de alerta.
+ 
+    Demuestra: parámetros, return, ciclo while, condicional, listas.
+    """
+    if len(registros) == 0:
+        return 0
+ 
+    minima = registros[0]["valor"]
+    indice = 1
+    while indice < len(registros):
+        if registros[indice]["valor"] < minima:
+            minima = registros[indice]["valor"]
+        indice = indice + 1
+ 
+    return minima
+ 
+ 
+# ---------------------------------------------------------------------
+# FUNCIÓN 13: alerta de oxigenación baja
+# ---------------------------------------------------------------------
+OXIGENACION_LIMITE_BAJA = 92
+ 
+def generar_alerta_oxigenacion(registros):
+    """
+    Revisa el promedio de oxigenación de los últimos 5 registros y
+    devuelve un mensaje de alerta si está por debajo del límite.
+ 
+    Reutiliza calcular_promedio_glucosa porque los registros de
+    oxigenación usan la misma llave "valor" que los de glucosa.
+ 
+    Demuestra: parámetros, return, condicional, slicing, uso de otra función.
+    """
+    registros_recientes = registros[-5:]
+    promedio_reciente = calcular_promedio_glucosa(registros_recientes)
+ 
+    if promedio_reciente < OXIGENACION_LIMITE_BAJA:
+        return "ALERTA: oxigenación baja. Revisar paciente."
+    else:
+        return "Oxigenación dentro de rango."
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA

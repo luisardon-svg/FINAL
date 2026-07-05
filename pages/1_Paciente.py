@@ -50,7 +50,15 @@ paciente = logica.pacientes_db[1]    #Accedemos al diccionario y sacamos al paci
 if "registros_memoria" not in st.session_state:
     st.session_state.registros_memoria = list(paciente["registros_glucosa"])
 
+if "presion_memoria" not in st.session_state:
+    st.session_state.presion_memoria = list(paciente["presion_arterial"])
+
+if "oxigenacion_memoria" not in st.session_state:
+    st.session_state.oxigenacion_memoria = list(paciente["oxigenacion"])
+
 registros = st.session_state.registros_memoria
+registros_presion = st.session_state.presion_memoria
+registros_oxigenacion = st.session_state.oxigenacion_memoria
 
 # -----------------------------------------------------------------------
 # CÁLCULOS reales con logica.py (nada se recalcula aquí)
@@ -234,6 +242,70 @@ if st.button("Registrar"):
     else:
         #Si no es válido, mostramos el mensaje de error de la función
         st.error(resultado["mensaje"])
+
+
+# =========================================================================
+# PRESIÓN ARTERIAL — resumen + evolución (mismo patrón que glucosa)
+# =========================================================================
+st.subheader("Resumen de presión arterial")
+ 
+promedio_presion = logica.calcular_promedio_presion(registros_presion)
+maxima_presion = logica.encontrar_presion_maxima(registros_presion)
+tendencia_presion = logica.detectar_tendencia_presion(registros_presion)
+ 
+col1, col2, col3 = st.columns(3)
+col1.metric("Promedio", f"{promedio_presion['sistolica']}/{promedio_presion['diastolica']} mmHg")
+col2.metric("Máximo", f"{maxima_presion['sistolica']}/{maxima_presion['diastolica']} mmHg")
+col3.metric("Tendencia", tendencia_presion)
+ 
+st.subheader("Evolución de la presión arterial")
+datos_grafica_presion = [{"Fecha": r["fecha"], "Sistólica": r["sistolica"]} for r in registros_presion]
+ 
+grafica_presion = alt.Chart(alt.Data(values=datos_grafica_presion)).mark_line(point=True).encode(
+    x=alt.X("Fecha:N", title="Fecha"),
+    y=alt.Y("Sistólica:Q", title="Sistólica (mmHg)", scale=alt.Scale(domain=[100, 170]))
+).properties(height=300)
+ 
+linea_limite_presion = (
+    alt.Chart(pd.DataFrame({"limite": [140]}))
+    .mark_rule(color="red", strokeDash=[4, 4])
+    .encode(y="limite:Q")
+)
+st.altair_chart(grafica_presion + linea_limite_presion, use_container_width=True)
+ 
+# =========================================================================
+# OXIGENACIÓN — resumen + evolución (mismo patrón, umbral hacia abajo)
+# =========================================================================
+st.subheader("Resumen de oxigenación")
+ 
+promedio_oxi = logica.calcular_promedio_glucosa(registros_oxigenacion)  # reutilizada: promedia "valor"
+minima_oxi = logica.encontrar_oxigenacion_minima(registros_oxigenacion)
+tendencia_oxi = logica.detectar_tendencia(registros_oxigenacion)  # reutilizada: mismo formato de registro
+ 
+col1, col2, col3 = st.columns(3)
+col1.metric("Promedio", f"{promedio_oxi} %")
+col2.metric("Mínimo", f"{minima_oxi} %")
+col3.metric("Tendencia", tendencia_oxi)
+ 
+st.subheader("Evolución de la oxigenación")
+datos_grafica_oxi = [{"Fecha": r["fecha"], "Oxigenación": r["valor"]} for r in registros_oxigenacion]
+ 
+grafica_oxi = alt.Chart(alt.Data(values=datos_grafica_oxi)).mark_line(point=True, color="#f59e0b").encode(
+    x=alt.X("Fecha:N", title="Fecha"),
+    y=alt.Y("Oxigenación:Q", title="SpO2 (%)", scale=alt.Scale(domain=[85, 100]))
+).properties(height=300)
+ 
+linea_limite_oxi = (
+    alt.Chart(pd.DataFrame({"limite": [92]}))
+    .mark_rule(color="orange", strokeDash=[4, 4])
+    .encode(y="limite:Q")
+)
+st.altair_chart(grafica_oxi + linea_limite_oxi, use_container_width=True)
+
+
+
+
+
 
 
 # --- SECCIÓN 5: Tabla de registros ---
