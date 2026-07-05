@@ -430,13 +430,34 @@ def generar_alerta_oxigenacion(registros):
     else:
         return "Oxigenación dentro de rango."
 
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 14: calcular el estado tipo "semáforo" del paciente
+# ---------------------------------------------------------------------
+def calcular_estado_semaforo(promedio, tendencia, alerta):
+    if "ALERTA" in alerta:
+        return "alerta"
+    elif tendencia == "Subiendo":
+        return "atencion"
+    else: 
+        return "estable"
+# ---------------------------------------------------------------------
+# FUNCIÓN 15: generar un resumen clínico en texto (versión local)
+# ---------------------------------------------------------------------
+def generar_resumen_clinico(datos_paciente, registros):
+    resumen = (
+        f"Paciente: {nombre}, edad años"
+        f"Glucosa promedio: {promedio} mg/dL (máxima: {maxima} mg/dL).\n"
+        f"Tendencia: {tendencia}. Estado general: {estado}.\n"
+        f"Observación: {alerta}"
+    )
+    return resumen     
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
 # ---------------------------------------------------------------------
 # Este bloque solo se ejecuta si corremos "python logica.py" directamente.
 # Si app.py importa este archivo, este bloque NO se ejecuta.
 # Sirve para demostrar que la lógica funciona sin necesidad de la web.
- 
 if __name__ == "__main__":
     print("=== Prueba de la lógica de SaludSeguimiento ===\n")
  
