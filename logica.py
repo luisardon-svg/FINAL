@@ -46,11 +46,11 @@ pacientes_db = {
             {"fecha": "2026-06-30", "valor": 162},
             {"fecha": "2026-07-01", "valor": 150},
             {"fecha": "2026-07-02", "valor": 145},
-            {"fecha": "2026-07-03", "valor": 138},
-            {"fecha": "2026-07-04", "valor": 132},
-            {"fecha": "2026-07-05", "valor": 128},
-            {"fecha": "2026-07-06", "valor": 125},
-            {"fecha": "2026-07-07", "valor": 122},
+            {"fecha": "2026-07-03", "valor": 148},
+            {"fecha": "2026-07-04", "valor": 152},
+            {"fecha": "2026-07-05", "valor": 156},
+            {"fecha": "2026-07-06", "valor": 160},
+            {"fecha": "2026-07-07", "valor": 165},
         ],
         
         "presion_arterial": [
