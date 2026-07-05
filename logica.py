@@ -35,13 +35,63 @@ pacientes_db = {
         ],
         # Registros de glucosa de los últimos 5 días (en mg/dL).
         # Esta es la métrica principal que analizamos para la demo.
+
         "registros_glucosa": [
             {"fecha": "2026-06-24", "valor": 145},
             {"fecha": "2026-06-25", "valor": 152},
             {"fecha": "2026-06-26", "valor": 148},
             {"fecha": "2026-06-27", "valor": 160},
             {"fecha": "2026-06-28", "valor": 155},
+            {"fecha": "2026-06-29", "valor": 158},
+            {"fecha": "2026-06-30", "valor": 162},
+            {"fecha": "2026-07-01", "valor": 150},
+            {"fecha": "2026-07-02", "valor": 145},
+            {"fecha": "2026-07-03", "valor": 138},
+            {"fecha": "2026-07-04", "valor": 132},
+            {"fecha": "2026-07-05", "valor": 128},
+            {"fecha": "2026-07-06", "valor": 125},
+            {"fecha": "2026-07-07", "valor": 122},
         ],
+        
+        "presion_arterial": [
+            {"fecha": "2026-06-24", "sistolica": 138, "diastolica": 86},
+            {"fecha": "2026-06-25", "sistolica": 142, "diastolica": 88},
+            {"fecha": "2026-06-26", "sistolica": 140, "diastolica": 87},
+            {"fecha": "2026-06-27", "sistolica": 148, "diastolica": 91},
+            {"fecha": "2026-06-28", "sistolica": 145, "diastolica": 90},
+            {"fecha": "2026-06-29", "sistolica": 150, "diastolica": 92},
+            {"fecha": "2026-06-30", "sistolica": 154, "diastolica": 95},
+            {"fecha": "2026-07-01", "sistolica": 147, "diastolica": 91},
+            {"fecha": "2026-07-02", "sistolica": 142, "diastolica": 88},
+            {"fecha": "2026-07-03", "sistolica": 136, "diastolica": 85},
+            {"fecha": "2026-07-04", "sistolica": 130, "diastolica": 83},
+            {"fecha": "2026-07-05", "sistolica": 126, "diastolica": 81},
+            {"fecha": "2026-07-06", "sistolica": 122, "diastolica": 79},
+            {"fecha": "2026-07-07", "sistolica": 118, "diastolica": 77},
+        ],
+
+        "oxigenacion": [
+            {"fecha": "2026-06-24", "valor": 97},
+            {"fecha": "2026-06-25", "valor": 96},
+            {"fecha": "2026-06-26", "valor": 96},
+            {"fecha": "2026-06-27", "valor": 95},
+            {"fecha": "2026-06-28", "valor": 95},
+            {"fecha": "2026-06-29", "valor": 94},
+            {"fecha": "2026-06-30", "valor": 93},
+            {"fecha": "2026-07-01", "valor": 94},
+            {"fecha": "2026-07-02", "valor": 95},
+            {"fecha": "2026-07-03", "valor": 96},
+            {"fecha": "2026-07-04", "valor": 96},
+            {"fecha": "2026-07-05", "valor": 97},
+            {"fecha": "2026-07-06", "valor": 97},
+            {"fecha": "2026-07-07", "valor": 98},
+        ],
+
+        "chequeos_previos": [
+            "Electrocardiograma - 15 marzo 2026 - Normal",
+            "Análisis de sangre - 02 mayo 2026 - Glucosa elevada",
+        ],
+
         # Otros síntomas que el paciente reporta (contexto extra)
         "otros_sintomas": ["Fatiga leve", "Mareos ocasionales"]
 
@@ -186,6 +236,55 @@ def validar_glucosa(valor_texto):
     else:
         # Si pasó las tres pruebas, es un valor válido.
         return {"valido": True, "mensaje": "Valor de glucosa válido."}
+    
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 6: validación de presión arterial
+# ---------------------------------------------------------------------
+
+def validar_presion_arterial(sistolica, diastolica):
+    """
+    Revisa una lectura de presión arterial.
+    Devuelve un diccionario con "valido" (bool) y "mensaje" (str).
+    """
+    try:
+        sistolica = int(sistolica)
+        diastolica = int(diastolica)
+    except (ValueError, TypeError):
+        return {"valido": False, "mensaje": "La presión arterial debe ser un número entero."}
+    
+    if sistolica <= diastolica:
+        return {"valido": False, "mensaje": "La sistólica debe ser mayor que la diastólica."}
+    
+    if not (70 <= sistolica <= 200):
+        return {"valido": False, "mensaje": "La sistólica debe estar entre 70 y 200 mmHg."}
+    
+    if not (40 <= diastolica <= 130):
+        return {"valido": False, "mensaje": "La diastólica debe estar entre 40 y 130 mmHg."}
+    
+    return {"valido": True, "mensaje": "Presión arterial válida."}
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 7: validación de oxigenación
+# ---------------------------------------------------------------------
+
+def validar_oxigenacion(spo2):
+    """
+    Revisa un valor de saturación de oxígeno (SpO2).
+    Devuelve un diccionario con "valido" (bool) y "mensaje" (str).
+    """
+
+    try:
+        spo2 = int(spo2)
+    except (ValueError, TypeError):
+        return {"valido": False, "mensaje": "La oxigenación debe ser un número entero."}
+
+
+    if not (70 <= spo2 <= 100):
+        return {"valido": False, "mensaje": "La oxigenación debe estar entre 70 y 100%."}
+
+    return {"valido": True, "mensaje": "Oxigenación válida."}
+
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
@@ -237,3 +336,18 @@ if __name__ == "__main__":
     for valor in valores_prueba:
         resultado = validar_glucosa(valor)
         print("Entrada:", repr(valor), "->", resultado["mensaje"])
+
+ # --- Pruebas de validar_presion_arterial ---
+    print("\n--- Pruebas: validar_presion_arterial ---")
+    print(validar_presion_arterial(120, 80))     # (True, "")
+    print(validar_presion_arterial(80, 120))     # (False, "sistólica debe ser mayor...")
+    print(validar_presion_arterial(250, 90))     # (False, "sistólica fuera de rango")
+    print(validar_presion_arterial(120, 20))     # (False, "diastólica fuera de rango")
+    print(validar_presion_arterial("abc", 80))   # (False, "debe ser un número entero")
+
+    # --- Pruebas de validar_oxigenacion ---
+    print("\n--- Pruebas: validar_oxigenacion ---")
+    print(validar_oxigenacion(96))    # (True, "")
+    print(validar_oxigenacion(65))    # (False, "fuera de rango")
+    print(validar_oxigenacion(101))   # (False, "fuera de rango")
+    print(validar_oxigenacion("xyz")) # (False, "debe ser un número entero")

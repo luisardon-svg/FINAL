@@ -4,7 +4,7 @@
 import streamlit as st
 import logica
 import altair as alt
-
+import pandas as pd
 
 st.set_page_config(page_title = "Paciente", page_icon = "👤")
 
@@ -72,8 +72,17 @@ grafica = alt.Chart(alt.Data(values=datos_grafica)).mark_line(point=True).encode
               scale=alt.Scale(domain=[100,180]))
 ).properties(height=300)
 
-# Mostramos la gráfica en Streamlit, ocupando todo el ancho.
-st.altair_chart(grafica, use_container_width=True)
+# Linea roja horizontal en el límite de alerta (130)
+linea_limite = (
+    alt.Chart(pd.DataFrame({"limite": [130]}))
+    .mark_rule(color="red", strokeDash=[4, 4])
+    .encode(y="limite:Q")
+)
+
+# Combinar ambas capas 
+grafica_final = grafica + linea_limite
+
+st.altair_chart(grafica_final, use_container_width=True)
 
 # --- SECCIÓN 4: Registrar nueva glucosa (con validación) ---
 st.subheader("Registrar nueva glucosa")
