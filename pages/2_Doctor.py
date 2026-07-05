@@ -73,6 +73,15 @@ elif estado == "atencion":
     st.warning("🟡 ATENCIÓN — vigilar de cerca")
 else: 
     st.success("🟢 ESTABLE — dentro de lo esperado")
+
+st.divider()
+#resumen clinico
+# generar_resumen_clinico (logica.py) arma el texto con f-strings,
+# reutilizando promedio, tendencia, alerta y semaforo.
+st.subheader("Resumen clínico")
+
+resumen = logica.generar_resumen_clinico(paciente, registros)
+st.text(resumen)
 #SECCION 4: Evolucion de glucosa
 st.subheader("Evolucion de glucosa")
 
