@@ -179,17 +179,20 @@ def detectar_tendencia(registros):
 
 def generar_alerta(registros):
     """
-    Revisa el promedio de glucosa y devuelve un mensaje de alerta para
-    el doctor si supera el límite considerado normal.
- 
-    Demuestra: parámetros, return, condicional, uso de otra función,
-    y una constante. Esta es la lógica que la doctora ve en su panel.
+    Revisa el promedio de glucosa de los registros MÁS RECIENTES (los
+    últimos 5) y devuelve un mensaje de alerta si supera el límite.
+    Usar solo los últimos registros refleja mejor el estado actual del
+    paciente que promediar todo el historial completo.
+
+    Demuestra: parámetros, return, condicional, slicing de listas,
+    y uso de otra función.
     """
-    
-    promedio = calcular_promedio_glucosa(registros)
+    registros_recientes = registros[-5:] #Slicing de listas
+
+    promedio_reciente = calcular_promedio_glucosa(registros_recientes)
 
     # Condicional: comparamos el promedio contra el límite
-    if promedio > GLUCOSA_LIMITE_ALTA:
+    if promedio_reciente > GLUCOSA_LIMITE_ALTA:
         return "ALERTA: glucosa promedio elevada. Revisar tratamiento."
     else:
         return "Glucosa promedio dentro de rango."
