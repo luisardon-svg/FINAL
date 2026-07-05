@@ -288,7 +288,20 @@ def validar_oxigenacion(spo2):
 
     return {"valido": True, "mensaje": "Oxigenación válida."}
 
-
+# ---------------------------------------------------------------------
+# FUNCIÓN 8: calcular el estado tipo "semáforo" del paciente
+# ---------------------------------------------------------------------
+def calcular_estado_semaforo(promedio, tendencia, alerta): 
+    #ROJO: alerta
+    #reutilizamos la decisión de generar_alerta: una sola fuente de verdad
+    if "ALERTA" in alerta: 
+        return "alerta"
+    #AMARILLO: sin alerta, pero tendencia va subiendo
+    elif tendencia == "Subiendo": 
+        return "atencion"
+    # VERDE: sin alerta, y estable
+    else: 
+        return "estable"
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
 # ---------------------------------------------------------------------
@@ -354,3 +367,5 @@ if __name__ == "__main__":
     print(validar_oxigenacion(65))    # (False, "fuera de rango")
     print(validar_oxigenacion(101))   # (False, "fuera de rango")
     print(validar_oxigenacion("xyz")) # (False, "debe ser un número entero")
+    estado = calcular_estado_semaforo(promedio, tendencia, alerta)
+    print("Estado (semaforo):", estado)
