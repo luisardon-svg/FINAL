@@ -22,7 +22,7 @@ from datetime import datetime
 
 pacientes_db = {
     1: {
-        "nombre": "Luis Fernado Carrasco",
+        "nombre": "Luis Fernando Carrasco",
         "edad": 60, 
         "es_cronico": True, #booleano: padecimiento crónico (sí)
         # Lista con el historial médico de fondo del paceinte.
