@@ -1,4 +1,4 @@
-# 🩺 Health Monitor
+# 🩺 Vital Health Monitor
 
 > Plataforma web donde los pacientes llevan una bitácora de su salud y el doctor da seguimiento remoto, relacionando los datos actuales con su historial — **sin necesidad de una cita presencial**.
 
