@@ -215,24 +215,21 @@ st.altair_chart(grafica_final, use_container_width=True)
 # --- SECCIÓN 4: Registrar nueva glucosa (con validación) ---
 st.subheader("Registrar nueva glucosa")
 
-
-# Campo de texto para que el usuario escriba el valor
-valor_nuevo = st.text_input("Valor de glucosa (mg/dL)")
-
 #Botón para registrar
-if st.button("Registrar"):
-    #Usamos NUESTRA función validar_glucosa de logica.py
-    resultado = logica.validar_glucosa(valor_nuevo)
 
+with st.form("form_glucosa", clear_on_submit=True):
+    valor_nuevo = st.text_input("Valor de glucosa (mg/dL)")
+    enviado = st.form_submit_button("Registrar")
+
+if enviado:
+    resultado = logica.validar_glucosa(valor_nuevo)
     if resultado["valido"]:
-        #Si es válido, lo agregamos a la memoria con la fecha de hoy
         from datetime import date
         nuevo_registro = {"fecha": str(date.today()), "valor": round(float(valor_nuevo), 2)}
         st.session_state.registros_memoria.append(nuevo_registro)
         st.success(resultado["mensaje"])
-        st.rerun() # vuelve a ejecutar todo para que la gráfica y métricas se actualicen
+        st.rerun()
     else:
-        #Si no es válido, mostramos el mensaje de error de la función
         st.error(resultado["mensaje"])
 
 
@@ -346,18 +343,17 @@ SINTOMAS_COMUNES = [
 
 # Función interna para dibujar el formulario. La usamos en las tres ramas
 # para no repetir el código del multiselect, texto libre y botón.
-def formulario_sintomas():
-    sintomas_seleccionados = st.multiselect(
-        "Marque los síntomas que está experimentando",
-        options=SINTOMAS_COMUNES,
-        key="sintomas_multiselect"
-    )
-    otro_sintoma = st.text_input(
-        "¿Otro síntoma no listado? (opcional)",
-        key="sintomas_otro"
-    )
 
-    if st.button("Registrar síntomas", key="btn_sintomas"):
+def formulario_sintomas():
+    with st.form("form_sintomas", clear_on_submit=True):
+        sintomas_seleccionados = st.multiselect(
+            "Marque los síntomas que está experimentando",
+            options=SINTOMAS_COMUNES
+        )
+        otro_sintoma = st.text_input("¿Otro síntoma no listado? (opcional)")
+        enviado_sintomas = st.form_submit_button("Registrar síntomas")
+
+    if enviado_sintomas:
         if not sintomas_seleccionados and otro_sintoma.strip() == "":
             st.error("Por favor seleccione al menos un síntoma o escriba uno.")
         else:
@@ -403,8 +399,9 @@ st.subheader("Historial de síntomas")
 sintomas_para_mostrar = []
 for registro in st.session_state.sintomas_memoria:
     sintomas_para_mostrar.append({
-        "fecha": registro["fecha"],
-        "síntomas reportados": ", ".join(registro["sintomas"])
+        "Fecha": registro["fecha"],
+        "Síntomas Reportados": ", ".join(registro["sintomas"])
     })
 
 st.table(sintomas_para_mostrar)
+
