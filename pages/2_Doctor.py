@@ -62,7 +62,26 @@ else:
     st.success(f"{alerta}")
 
 st.divider()
+#Semaforo de estado general
+estado = logica.calcular_estado_semaforo(promedio, tendencia, alerta)
 
+st.subheader("Estado general del paciente")
+
+if estado == "alerta":
+    st.error("🔴 ALERTA — requiere atención inmediata")
+elif estado == "atencion":
+    st.warning("🟡 ATENCIÓN — vigilar de cerca")
+else: 
+    st.success("🟢 ESTABLE — dentro de lo esperado")
+
+st.divider()
+#resumen clinico
+# generar_resumen_clinico (logica.py) arma el texto con f-strings,
+# reutilizando promedio, tendencia, alerta y semaforo.
+st.subheader("Resumen clínico")
+
+resumen = logica.generar_resumen_clinico(paciente, registros)
+st.text(resumen)
 #SECCION 4: Evolucion de glucosa
 st.subheader("Evolucion de glucosa")
 
