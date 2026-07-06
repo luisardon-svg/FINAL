@@ -85,7 +85,7 @@ def formatear_fecha_corta(fecha_iso):
     return f"{partes[2]} {MESES[partes[1]]}"
 
 fecha_inicio = formatear_fecha_corta(registros[0]["fecha"])
-fecha_fin = formatear_fecha_corta(registros[1]["fecha"])
+fecha_fin = formatear_fecha_corta(registros[-1]["fecha"])
 
 # Inciales para el avatar: primera letra del primer y último nombre
 partes_nombre = paciente["nombre"].split()
@@ -168,16 +168,8 @@ for condicion in paciente["historial_medico"]:
 # --- SECCIÓN 2: Resumen de glucosa (cifras clave) ---
 st.subheader("Resumen de glucosa")
 
-# Sacamos la lista de registros de glucosa del paciente
-registros = paciente["registros_glucosa"]
-
-# Usamos la memoria como fuente de datos
-registros = st.session_state.registros_memoria  # Reasignamos "registros" para que se almacene en memoria
-
-# Usamos NUESTRAS funciones de logica.py para calcular cada dato
-promedio = logica.calcular_promedio_glucosa(registros)
-maximo = logica.encontrar_glucosa_maxima(registros)
-tendencia = logica.detectar_tendencia(registros)
+# promedio, maximo y tendencia ya fueron calculados arriba a partir
+# de st.session_state.registros_memoria (no recalculamos nada aquí).
 
 # st.columns crea columnas para poner las métricas lado a lado
 col1, col2, col3 = st.columns(3)
