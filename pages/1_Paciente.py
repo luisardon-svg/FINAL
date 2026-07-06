@@ -295,11 +295,6 @@ linea_limite_oxi = (
 st.altair_chart(grafica_oxi + linea_limite_oxi, use_container_width=True)
 
 
-
-
-
-
-
 # --- SECCIÓN 5: Tabla de registros ---
 st.subheader("Historial de registros")
 
@@ -317,3 +312,99 @@ for registro in st.session_state.registros_memoria:
     })
 
 st.table(registros_para_mostrar)
+
+# =========================================================================
+# SECCIÓN 6: Registro de síntomas (adaptativo según semáforo)
+# =========================================================================
+# El registro SIEMPRE está disponible — los síntomas pueden aparecer aunque
+# las métricas estén bien (mareo por otra causa, etc.). Lo que cambia es
+# el tono y la prominencia visual según el estado del paciente.
+# Reutilizamos estado_semaforo que ya fue calculado arriba con logica.py.
+
+# Inicializamos la memoria de síntomas una sola vez.
+if "sintomas_memoria" not in st.session_state:
+    st.session_state.sintomas_memoria = []
+    for sintoma_previo in paciente["otros_sintomas"]:
+        st.session_state.sintomas_memoria.append({
+            "fecha": "Previo",
+            "sintomas": [sintoma_previo]
+        })
+
+# Lista predefinida de síntomas comunes en diabetes/hipertensión.
+SINTOMAS_COMUNES = [
+    "Dolor de cabeza",
+    "Mareo",
+    "Fatiga",
+    "Visión borrosa",
+    "Sed excesiva",
+    "Temblores",
+    "Sudoración",
+    "Palpitaciones",
+    "Náuseas",
+    "Hormigueo en manos o pies"
+]
+
+# Función interna para dibujar el formulario. La usamos en las tres ramas
+# para no repetir el código del multiselect, texto libre y botón.
+def formulario_sintomas():
+    sintomas_seleccionados = st.multiselect(
+        "Marque los síntomas que está experimentando",
+        options=SINTOMAS_COMUNES,
+        key="sintomas_multiselect"
+    )
+    otro_sintoma = st.text_input(
+        "¿Otro síntoma no listado? (opcional)",
+        key="sintomas_otro"
+    )
+
+    if st.button("Registrar síntomas", key="btn_sintomas"):
+        if not sintomas_seleccionados and otro_sintoma.strip() == "":
+            st.error("Por favor seleccione al menos un síntoma o escriba uno.")
+        else:
+            sintomas_de_hoy = list(sintomas_seleccionados)
+            if otro_sintoma.strip() != "":
+                sintomas_de_hoy.append(otro_sintoma.strip())
+
+            nuevo_registro = {
+                "fecha": str(date.today()),
+                "sintomas": sintomas_de_hoy
+            }
+            st.session_state.sintomas_memoria.append(nuevo_registro)
+            st.success("Síntomas registrados. Su doctora podrá verlos en su próxima revisión.")
+            st.rerun()
+
+# --- Presentación adaptativa según el semáforo ---
+if estado_semaforo == "alerta":
+    # Estado rojo: prominente, con banner destacado.
+    st.markdown("""
+    <div class="alerta-banner">
+        🔔 Nos gustaría saber cómo se siente. Por favor, marque los síntomas que esté experimentando.
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    formulario_sintomas()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+elif estado_semaforo == "atencion":
+    # Estado amarillo: visible, tono neutral.
+    st.subheader("¿Cómo se siente hoy?")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    formulario_sintomas()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+else:
+    # Estado verde/estable: discreto, dentro de un expander desplegable.
+    with st.expander("¿Quiere reportar cómo se siente hoy? (opcional)"):
+        formulario_sintomas()
+
+# --- Historial de síntomas reportados (siempre visible) ---
+st.subheader("Historial de síntomas")
+
+sintomas_para_mostrar = []
+for registro in st.session_state.sintomas_memoria:
+    sintomas_para_mostrar.append({
+        "fecha": registro["fecha"],
+        "síntomas reportados": ", ".join(registro["sintomas"])
+    })
+
+st.table(sintomas_para_mostrar)
