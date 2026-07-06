@@ -114,6 +114,81 @@ grafica_final = grafica + limite
 st.altair_chart(grafica_final, use_container_width=True)
 st.caption(f"La linea roja marca el limite de {logica.GLUCOSA_LIMITE_ALTA} mg/dL. Las lecturas por encima disparan la alerta.")
 
+#SECCION: Presion arterial
+#LEEMOS LA MEMORIA COMPARTIDA (O DE PACIENTE_DB COMO RESPALDO).
+if "presion_memoria" not in st.session_state: 
+    st.session_state.presion_memoria = list(paciente["presion_arterial"])
+registros_presion = st.session_state.presion_memoria
+
+promedio_presion = logica.calcular_promedio_presion(registros_presion)
+maxima_presion = logica.encontrar_presion_maxima(registros_presion)
+tendencia_presion = logica.detectar_tendencia_presion(registros_presion)
+alerta_presion = logica.generar_alerta_presion(registros_presion)
+
+st.subheader("Presion arterial")
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Promedio", f"{promedio_presion['sistolica']}/{promedio_presion['diastolica']} mmHg")
+col2.metric("Máxima", f"{maxima_presion['sistolica']}/{maxima_presion['diastolica']} mmHg")
+col3.metric("Tendencia", tendencia_presion)
+
+#Alerta de presión (mismo patrón que la glucosa)
+if "ALERTA" in alerta_presion: 
+    st.error(f"**{alerta_presion}**")
+else:
+    st.success(alerta_presion)
+
+# Gráfica de evolución de la sistólica, con línea roja en el límite (140)
+datos_presion = []
+for r in registros_presion:
+    datos_presion.append({"Fecha": r["fecha"], "sistolica": r["sistolica"]})
+
+grafica_presion = alt.Chart(alt.Data(values=datos_presion)).mark_line(point=True).encode(
+    x=alt.X("Fecha:N", title="Fecha"),
+    y=alt.Y("sistolica:Q", title="Sistólica (mmHg)", scale=alt.Scale(domain=[100, 170]))
+).properties(height=300)
+
+limite_presion = alt.Chart(
+    alt.Data(values=[{"sistolica": logica.PRESION_SISTOLICA_LIMITE}])
+).mark_rule(color="red", strokeDash=[6, 4]).encode(y="sistolica:Q")
+
+st.altair_chart(grafica_presion + limite_presion, use_container_width=True)
+
+#SECCION: Oxigenación (sp=2)
+# Leemos de la memoria compartida (o del pacientes_db como respaldo). 
+if "oxigenacion_memoria" not in st.session_state:
+    st.session_state.oxigenacion_memoria = list(paciente["oxigenacion"])
+registros_oxi = st.session_state.oxigenacion_memoria
+
+#Cálculos con las funciones de logica.py
+promedio_oxi = logica.calcular_promedio_glucosa(registros_oxi) #calcula "valor"
+minima_oxi = logica.encontrar_oxigenacion_minima(registros_oxi)
+tendencia_oxi = logica.detectar_tendencia(registros_oxi)
+alerta_oxi = logica.generar_alerta_oxigenacion(registros_oxi)
+
+st. subheader("Oxigenacion (SpO2)")
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Promedio", f"{promedio_oxi} %")
+col2.metric("Mínimo", f"{minima_oxi} %")
+col3.metric("Tendencia", tendencia_oxi)
+
+#Gráfica de evolución, con línea naranja en el límite (92 - threshhold bajo)
+datos_oxi = []
+for r in registros_oxi: 
+    datos_oxi.append({"Fecha": r["fecha"], "spo2": r["valor"]})
+
+grafica_oxi = alt.Chart(alt.Data(values=datos_oxi)).mark_line(point=True, color="#f59e0b").encode(
+    x=alt.X("Fecha:N", title="Fecha"),
+    y=alt.Y("spo2:Q", title="SpO2 (%)", scale=alt.Scale(domain=[85, 100]))
+).properties(height=300)
+
+limite_oxi = alt.Chart(
+    alt.Data(values=[{"spo2": logica.OXIGENACION_LIMITE_BAJA}])
+).mark_rule(color="orange", strokeDash=[6, 4]).encode(y="spo2:Q")
+
+st.altair_chart(grafica_oxi + limite_oxi, use_container_width=True)
+
 st.divider()
 #SECCION 5: decision de doctor
 #Refleja la decision final del profesional
