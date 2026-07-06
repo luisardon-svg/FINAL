@@ -2,7 +2,6 @@
 #Pagina principal de la aplicación
 # Streamlit usa archivo como pag. de inicio; el resto estaran en pages/ y aparecerán en barra lateral
 import streamlit as st #Importamos libreria de stremlit
-import logica #modulo con logica de porgra
 st.set_page_config(page_title="Vital Health Monitor", page_icon="⚕️", layout="centered")
 
 #ENCABEZADO
@@ -37,7 +36,3 @@ st.info(
     "Nunca se automatiza la receta médica."
 )
 st.caption("Usa el menú de la izquierda para entrar al panel del paciente o del doctor.")
-#prueba de conexion con logica.py
-#traemos al paciente empleado en el caso
-paciente = logica.pacientes_db[1]
-registros = paciente ["registros_glucosa"]
