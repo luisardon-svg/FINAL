@@ -16,7 +16,7 @@ st.divider()
 
 #Datos básicos del paciente
 st.header(paciente["nombre"])
-st.write(f"**Edad:** {paciente['edad']} anios")
+st.write(f"**Edad:** {paciente['edad']} añios")
 
 #Historial medico: recorremos la lista con un ciclo for
 st.subheader("Historial medico")
