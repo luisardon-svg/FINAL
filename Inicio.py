@@ -79,3 +79,73 @@ st.info(
     "Nunca se automatiza la receta médica."
 )
 st.caption("Usa el menú de la izquierda para entrar al panel del paciente o del doctor.")
+
+st.divider()
+
+# --- GLOSARIO DE TÉRMINOS MÉDICOS ---
+st.subheader("📚 Glosario de términos médicos")
+
+with st.expander("**Glucosa**"):
+    st.write("""
+    Azúcar en la sangre. Es la principal fuente de energía del cuerpo. 
+    - **Rango normal:** 70–100 mg/dL en ayuno.
+    - **En este proyecto:** límite de alerta = **130 mg/dL**. Valores superiores sugieren diabetes descontrolada.
+    """)
+
+with st.expander("**Presión arterial (PA)**"):
+    st.write("""
+    Fuerza con la que la sangre empuja contra las paredes de las arterias.
+    Se mide en mmHg (milímetros de mercurio) y tiene dos valores: sistólica/diastólica.
+    - **Rango normal:** 120/80 mmHg o menor.
+    - **En este proyecto:** límite de alerta sistólica = **140 mmHg**. Valores superiores indican hipertensión.
+    """)
+
+with st.expander("**Sistólica (presión sistólica)**"):
+    st.write("""
+    Presión MÁXIMA cuando el corazón se contrae y bombea sangre.
+    Es el primer número en la lectura de PA (ej. **140**/80).
+    - **Normal:** < 120 mmHg.
+    - **En este proyecto:** monitoreo continuo con alerta en 140 mmHg.
+    """)
+
+with st.expander("**Diastólica (presión diastólica)**"):
+    st.write("""
+    Presión MÍNIMA cuando el corazón se relaja entre latidos.
+    Es el segundo número en la lectura de PA (ej. 140/**90**).
+    - **Normal:** < 80 mmHg.
+    - **En este proyecto:** se registra pero sin alerta independiente (el límite principal es sistólica > 140).
+    """)
+
+with st.expander("**Oxigenación / SpO₂ (saturación de oxígeno)**"):
+    st.write("""
+    Porcentaje de hemoglobina en la sangre que transporta oxígeno.
+    Se mide en % y refleja cuánto oxígeno tienen los glóbulos rojos.
+    - **Rango normal:** 95–100%.
+    - **En este proyecto:** límite de alerta = **< 92%**. Valores inferiores sugieren hipoxia (falta de oxígeno).
+    """)
+
+with st.expander("**Tendencia**"):
+    st.write("""
+    Dirección general de los valores en el tiempo.
+    - **Subiendo:** los valores aumentan en los últimos días → riesgo de empeorar.
+    - **Bajando:** los valores disminuyen en los últimos días → mejora.
+    - **Estable:** sin cambio significativo.
+    """)
+
+with st.expander("**Semáforo de estado**"):
+    st.write("""
+    Indicador visual del riesgo general del paciente basado en todas las métricas:
+    - 🔴 **ALERTA:** alguna métrica está fuera de rango (requiere atención inmediata).
+    - 🟡 **ATENCIÓN:** métrica en zona de riesgo o tendencia adversa (vigilar).
+    - 🟢 **ESTABLE:** todas las métricas dentro de rango normal.
+    """)
+
+with st.expander("**Racha de alerta (días consecutivos)**"):
+    st.write("""
+    Número de días seguidos en los que una métrica ha estado fuera de rango.
+    Calculado de forma recursiva, de atrás hacia adelante en el historial.
+    - Racha = 14 días significa que TODOS los últimos 14 días el paciente estuvo en alerta.
+    - Racha = 0 significa que hoy está normal (fuera de alerta).
+    """)
+
+st.caption("Usa el menú de la izquierda para entrar al panel del Paciente o del Doctor.")
