@@ -41,11 +41,18 @@ tendencia = logica.detectar_tendencia(registros)
 
 st.subheader("Metricas de glucosa")
 
-#st.columns; crearemos 3
-col1, col2, col3, = st.columns(3)
+racha = logica.calcular_racha_dias_alerta(registros)
+
+# Cuadrícula 2x2 en vez de 1 fila de 4 — cada métrica tiene más espacio
+# horizontal, evitando que los valores se corten con "..."
+
+col1, col2 = st.columns(2)
 col1.metric("Promedio", f"{promedio} mg/dL")
 col2.metric("Maxima", f"{maxima} mg/dL")
+
+col3, col4 = st.columns(2)
 col3.metric("Tendencia", tendencia)
+col4.metric("Racha en alerta", f"{racha} días")
 
 st.divider()
 
