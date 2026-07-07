@@ -537,6 +537,53 @@ def calcular_racha_dias_alerta(registros, posicion=None):
     return 1 + calcular_racha_dias_alerta(registros, posicion - 1)
 
 
+# ---------------------------------------------------------------------
+# FUNCIÓN 18: racha de días consecutivos en alerta — presión arterial
+# ---------------------------------------------------------------------
+
+def calcular_racha_dias_alerta_presion(registros, posicion=None):
+    """
+    Misma lógica que calcular_racha_dias_alerta, pero para presión:
+    cuenta días consecutivos (desde el más reciente) donde la sistólica
+    superó PRESION_SISTOLICA_LIMITE.
+    """
+    if posicion is None:
+        posicion = len(registros) - 1
+
+    if posicion < 0:
+        return 0
+
+    dia_en_alerta = registros[posicion]["sistolica"] > PRESION_SISTOLICA_LIMITE
+
+    if not dia_en_alerta:
+        return 0
+
+    return 1 + calcular_racha_dias_alerta_presion(registros, posicion - 1)
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 19: racha de días consecutivos en alerta — oxigenación
+# ---------------------------------------------------------------------
+
+def calcular_racha_dias_alerta_oxigenacion(registros, posicion=None):
+    """
+    Misma lógica, pero invertida: aquí la alerta es cuando el valor está
+    POR DEBAJO del límite (una oxigenación baja es la señal de riesgo,
+    a diferencia de glucosa y presión donde el riesgo es un valor alto).
+    """
+    if posicion is None:
+        posicion = len(registros) - 1
+
+    if posicion < 0:
+        return 0
+
+    dia_en_alerta = registros[posicion]["valor"] < OXIGENACION_LIMITE_BAJA
+
+    if not dia_en_alerta:
+        return 0
+
+    return 1 + calcular_racha_dias_alerta_oxigenacion(registros, posicion - 1)
+
+
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
