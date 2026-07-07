@@ -66,7 +66,27 @@ elif estado == "atencion":
 else: 
     st.success("🟢 ESTABLE — dentro de lo esperado")
 
-st.divider()
+
+
+# --- Capa opcional: análisis generado por IA (Gemini) ---
+if st.button("🤖 Generar análisis con IA (opcional)"):
+    with st.spinner("Consultando a Gemini..."):
+        analisis_ia = logica.generar_recomendacion_ia(
+            paciente=paciente,
+            promedio_glucosa=promedio,
+            tendencia_glucosa=tendencia,
+            estado_semaforo=estado
+        )
+    # Guardamos el resultado en session_state para que no se pierda al re-renderizar
+    st.session_state.analisis_ia = analisis_ia
+
+# Si ya se generó un análisis con IA, lo mostramos
+if "analisis_ia" in st.session_state:
+    st.markdown("**🤖 Análisis generado por IA (para revisión del doctor):**")
+    st.write(st.session_state.analisis_ia)
+
+st.divider() 
+
 #resumen clinico
 # generar_resumen_clinico (logica.py) arma el texto con f-strings,
 # reutilizando promedio, tendencia, alerta y semaforo.
@@ -245,6 +265,9 @@ recomendacion_sugerida = logica.generar_recomendacion_sugerida(
     tendencia_glucosa=tendencia
 )
 
+
+
+
 # ORDEN DE PRIORIDAD DE LOS ESTADOS (importante):
 # 1º edición  →  2º ya hay decisión guardada  →  3º primera vez (sin decisión)
 # El modo edición va primero porque, al activarlo, recomendacion_doctor
@@ -316,6 +339,8 @@ elif st.session_state.recomendacion_doctor is not None:
 else:
     # --- Primera vez: no hay decisión todavía. Mostramos la sugerencia + 3 botones ---
     st.info(f"💡 **Sugerencia del sistema:** {recomendacion_sugerida['texto']}")
+
+   
 
     col1, col2, col3 = st.columns(3)
     with col1:

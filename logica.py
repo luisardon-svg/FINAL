@@ -11,6 +11,8 @@ que las funciones funcionan, usando el bloque if __name__ == "__main__"
 # Importamos una librería estándar: datetime nos sirve para trabajar
 # con las fechas de cada registro de síntomas
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv() #Lee el archivo .env y carga sus variables al entorno
 
 # ---------------------------------------------------------------------
 # ESTRUCTURAS DE DATOS (diccionarios y listas)
@@ -584,6 +586,49 @@ def calcular_racha_dias_alerta_oxigenacion(registros, posicion=None):
     return 1 + calcular_racha_dias_alerta_oxigenacion(registros, posicion - 1)
 
 
+# ---------------------------------------------------------------------
+# FUNCIÓN 20: API GEMINI
+# ---------------------------------------------------------------------
+
+def generar_recomendacion_ia(paciente, promedio_glucosa, tendencia_glucosa, estado_semaforo):
+    """
+    Genera una recomendación usando la API de Gemini (capa OPCIONAL).
+    El sistema SUGIERE; el doctor siempre revisa y aprueba.
+    Si algo falla (sin internet, sin key, error de API), devuelve un
+    mensaje de respaldo para que la app nunca se rompa en la demo.
+    """
+    import os
+    from google import genai
+
+    # La key se lee de la variable de entorno, nunca se escribe en el código.
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return "⚠️ No se encontró la API key de Gemini. Usa la sugerencia del sistema."
+
+    try:
+        cliente = genai.Client(api_key=api_key)
+
+        # Armamos el prompt con los datos reales del paciente.
+        prompt = (
+            f"Eres un asistente médico de apoyo. NO prescribes de forma definitiva; "
+            f"solo sugieres para que un DOCTOR humano revise y apruebe.\n\n"
+            f"Paciente: {paciente['nombre']}, {paciente['edad']} años.\n"
+            f"Historial: {', '.join(paciente['historial_medico'])}.\n"
+            f"Glucosa promedio: {promedio_glucosa} mg/dL. "
+            f"Tendencia: {tendencia_glucosa}. Estado general: {estado_semaforo}.\n\n"
+            f"Redacta una recomendación breve (máximo 3 frases) para que el doctor "
+            f"la revise. Termina recordando que la decisión final es del médico."
+        )
+
+        respuesta = cliente.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        return respuesta.text
+
+    except Exception as error:
+        # Si la API falla por cualquier razón, la app no se cae.
+        return f"⚠️ No se pudo generar el análisis con IA ({error}). Usa la sugerencia del sistema."
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
