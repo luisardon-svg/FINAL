@@ -9,17 +9,43 @@ st.set_page_config(page_title = "Doctor", page_icon = "🩺")
 
 paciente = logica.pacientes_db[1]
 
-st.title("Panel de doctor")
-st.write("Seguimiento remoto del paciente")
+st.title(" 👩‍⚕️ ¡Bienvenida Dra. Sofía Mendoza García!")
+# ============================================
+# INFORMACIÓN DE LA DOCTORA
+# Se muestra justo debajo del título del panel
+# ============================================
+st.markdown("""
+<div style="
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #4da3ff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 15px;
+    color: #fafafa;
+">
+    <div style="font-size: 16px; font-weight: 600; color: #4da3ff; margin-bottom: 8px;">
+        📋 Datos básicos
+    </div>
+    <div style="line-height: 1.9;">
+        ├─ <strong>Especialidades:</strong> Medicina Interna + Endocrinología<br>
+        ├─ <strong>Cédula:</strong> 45-123456<br>
+        ├─ <strong>Hospital/Clínica:</strong> Centro Médico "La Paz"<br>
+        ├─ <strong>Experiencia:</strong> 15 años<br>
+        └─ <strong>Teléfono:</strong> +502 7777-1234
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
 
 #Datos básicos del paciente
+st.title(" 🩺 Paciente:")
 st.header(paciente["nombre"])
 st.write(f"**Edad:** {paciente['edad']} años")
 
 #Historial medico: recorremos la lista con un ciclo for
-st.subheader("Historial medico")
+st.subheader("Historial médico")
 for condicion in paciente["historial_medico"]:
     st.write("- " + condicion)
 
@@ -244,6 +270,44 @@ limite_oxi = alt.Chart(
 st.altair_chart(grafica_oxi + limite_oxi, use_container_width=True)
 
 st.divider()
+
+st.divider()
+
+# =========================================================================
+# SECCIÓN: Síntomas reportados por el paciente
+# =========================================================================
+# Leemos la misma memoria compartida que usa el Panel Paciente.
+# Si el paciente aún no ha abierto su panel, iniciamos con lo que ya
+# existe en pacientes_db (chequeos previos guardados como "otros_sintomas").
+if "sintomas_memoria" not in st.session_state:
+    st.session_state.sintomas_memoria = []
+    for sintoma_previo in paciente["otros_sintomas"]:
+        st.session_state.sintomas_memoria.append({
+            "fecha": "Previo",
+            "sintomas": [sintoma_previo]
+        })
+
+st.subheader("Síntomas reportados por el paciente")
+
+if len(st.session_state.sintomas_memoria) == 0:
+    st.info("El paciente no ha reportado síntomas.")
+else:
+    # Mostramos el más reciente destacado, y el resto en una tabla desplegable.
+    ultimo_registro = st.session_state.sintomas_memoria[-1]
+    st.warning(
+        f"**Último reporte ({ultimo_registro['fecha']}):** "
+        f"{', '.join(ultimo_registro['sintomas'])}"
+    )
+
+    with st.expander("Ver historial completo de síntomas"):
+        sintomas_para_mostrar = []
+        for registro in st.session_state.sintomas_memoria:
+            sintomas_para_mostrar.append({
+                "fecha": registro["fecha"],
+                "síntomas reportados": ", ".join(registro["sintomas"])
+            })
+        st.table(sintomas_para_mostrar)
+
 
 # =========================================================================
 # SECCIÓN: Análisis sugerido (tarjeta con botones Aprobar / Editar / Rechazar)
