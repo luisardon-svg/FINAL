@@ -39,15 +39,7 @@ promedio = logica.calcular_promedio_glucosa(registros)
 maxima = logica.encontrar_glucosa_maxima(registros)
 tendencia = logica.detectar_tendencia(registros)
 
-st.subheader("Metricas de glucosa")
 
-#st.columns; crearemos 3
-col1, col2, col3, = st.columns(3)
-col1.metric("Promedio", f"{promedio} mg/dL")
-col2.metric("Maxima", f"{maxima} mg/dL")
-col3.metric("Tendencia", tendencia)
-
-st.divider()
 
 #SECCION #: Alerta
 # generar_alerta (logica.py) decide el mensaje segun el promedio
@@ -82,6 +74,25 @@ st.subheader("Resumen clínico")
 
 resumen = logica.generar_resumen_clinico(paciente, registros)
 st.text(resumen)
+
+# Métricas de glucosa
+st.subheader("Métricas de glucosa")
+
+racha = logica.calcular_racha_dias_alerta(registros)
+
+# Cuadrícula 2x2 en vez de 1 fila de 4 — cada métrica tiene más espacio
+# horizontal, evitando que los valores se corten con "..."
+
+col1, col2 = st.columns(2)
+col1.metric("Promedio", f"{promedio} mg/dL")
+col2.metric("Maxima", f"{maxima} mg/dL")
+
+col3, col4 = st.columns(2)
+col3.metric("Tendencia", tendencia)
+col4.metric("Racha en alerta", f"{racha} días")
+
+st.divider()
+
 #SECCION 4: Evolucion de glucosa
 st.subheader("Evolucion de glucosa")
 
@@ -114,6 +125,13 @@ grafica_final = grafica + limite
 st.altair_chart(grafica_final, use_container_width=True)
 st.caption(f"La linea roja marca el limite de {logica.GLUCOSA_LIMITE_ALTA} mg/dL. Las lecturas por encima disparan la alerta.")
 
+if "ALERTA" in alerta:
+    st.error(f"**{alerta}**")
+else: 
+    st.success(f"{alerta}")
+    
+
+
 #SECCION: Presion arterial
 #LEEMOS LA MEMORIA COMPARTIDA (O DE PACIENTE_DB COMO RESPALDO).
 if "presion_memoria" not in st.session_state: 
@@ -127,10 +145,15 @@ alerta_presion = logica.generar_alerta_presion(registros_presion)
 
 st.subheader("Presion arterial")
 
-col1, col2, col3 = st.columns(3)
+racha_presion = logica.calcular_racha_dias_alerta_presion(registros_presion)
+
+col1, col2 = st.columns(2)
 col1.metric("Promedio", f"{promedio_presion['sistolica']}/{promedio_presion['diastolica']} mmHg")
 col2.metric("Máxima", f"{maxima_presion['sistolica']}/{maxima_presion['diastolica']} mmHg")
+
+col3, col4 = st.columns(2)
 col3.metric("Tendencia", tendencia_presion)
+col4.metric("Racha en alerta", f"{racha_presion} días")
 
 #Alerta de presión (mismo patrón que la glucosa)
 if "ALERTA" in alerta_presion: 
@@ -168,10 +191,21 @@ alerta_oxi = logica.generar_alerta_oxigenacion(registros_oxi)
 
 st. subheader("Oxigenacion (SpO2)")
 
-col1, col2, col3 = st.columns(3)
+racha_oxi = logica.calcular_racha_dias_alerta_oxigenacion(registros_oxi)
+
+col1, col2 = st.columns(2)
 col1.metric("Promedio", f"{promedio_oxi} %")
 col2.metric("Mínimo", f"{minima_oxi} %")
+
+col3, col4 = st.columns(2)
 col3.metric("Tendencia", tendencia_oxi)
+col4.metric("Racha en alerta", f"{racha_oxi} días")
+
+#Alerta de oxigenación (mismo patrón que glucosa y presión)
+if "ALERTA" in alerta_oxi:
+    st.error(f"**{alerta_oxi}**")
+else:
+    st.success(alerta_oxi)
 
 #Gráfica de evolución, con línea naranja en el límite (92 - threshhold bajo)
 datos_oxi = []
