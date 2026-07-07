@@ -30,6 +30,7 @@ st.markdown("""
 }
 .badge-amarillo { background-color: rgba(234,179,8,0.15); color: #eab308; }
 .badge-verde    { background-color: rgba(34,197,94,0.15); color: #22c55e; }
+.badge-rojo     { background-color: rgba(239,68,68,0.15); color: #ef4444; }
 .alerta-banner {
     background-color: rgba(153,27,27,0.55); border-radius: 10px;
     padding: 14px 18px; color: #fecaca; font-size: 14px; margin-bottom: 20px;
@@ -70,9 +71,14 @@ tendencia = logica.detectar_tendencia(registros)
 alerta = logica.generar_alerta(registros)
 hay_alerta = alerta.startswith("ALERTA")
 
-estado_semaforo = "amarillo" if hay_alerta else "verde"
-clase_badge = "badge-amarillo" if hay_alerta else "badge-verde"
-
+# Única fuente de verdad: la misma función que usa el Panel Doctor.
+# Devuelve "alerta", "atencion" o "estable" — nunca colores sueltos.
+estado_semaforo = logica.calcular_estado_semaforo(promedio, tendencia, alerta)
+clase_badge = (
+    "badge-rojo" if estado_semaforo == "alerta"
+    else "badge-amarillo" if estado_semaforo == "atencion"
+    else "badge-verde"
+)
 
 # Pequeño helper para mostrar fechas como "24 jun" en vez de "2026-06-24".
 # Usamos un diccionario en vez de librerías de localización, para que
