@@ -453,10 +453,13 @@ def generar_resumen_clinico(datos_paciente, registros):
     tendencia = detectar_tendencia(registros)
     alerta = generar_alerta(registros)
     estado = calcular_estado_semaforo(promedio, tendencia, alerta)
+    racha = calcular_racha_dias_alerta(registros)
+
     resumen = (
         f"Paciente: {nombre}, {edad} años.\n"
         f"Glucosa promedio: {promedio} mg/dL (máxima: {maxima} mg/dL).\n"
         f"Tendencia: {tendencia}. Estado general: {estado}.\n"
+        f"Racha de días en alerta: {racha}.\n"
         f"Observación: {alerta}"
     )
     return resumen     
@@ -496,6 +499,44 @@ def generar_recomendacion_sugerida(estado_semaforo, promedio_glucosa, tendencia_
         "editado_por_doctor": False,
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M")
     }
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 17: racha de días consecutivos en alerta (RECURSIVA)
+# ---------------------------------------------------------------------
+
+def calcular_racha_dias_alerta(registros, posicion=None):
+    """
+    Cuenta cuántos días consecutivos, empezando por el más reciente y
+    yendo hacia atrás, el paciente registró glucosa por encima del
+    límite (GLUCOSA_LIMITE_ALTA). En cuanto encuentra un día SIN alerta,
+    la racha se corta ahí.
+
+    Caso base: no quedan registros que revisar (posicion < 0), o el día
+    actual NO está en alerta -> la racha termina, devolvemos 0.
+    Caso recursivo: el día actual SÍ está en alerta -> devolvemos
+    1 (por este día) + la racha de todos los días anteriores.
+
+    Demuestra: recursión, parámetro con valor por defecto, condicional.
+    """
+    #Primera llamada: sin posición indicada, empezamos por el último registro (el más reciente)
+
+    if posicion is None:
+        posicion = len(registros) - 1
+    
+    #Caso base 1: ya no hay más días que revisar hacia atrás.
+    if posicion < 0:
+        return 0
+
+    dia_en_alerta = registros[posicion]["valor"] > GLUCOSA_LIMITE_ALTA
+
+    #Caso base 2: este día no está en alerta -> la racha se corta aquí.
+    if not dia_en_alerta:
+        return 0
+
+    #Caso recursivo: cuento este día + lo que diga la racha del día anterior
+    return 1 + calcular_racha_dias_alerta(registros, posicion - 1)
+
+
 
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
