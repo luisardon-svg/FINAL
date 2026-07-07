@@ -232,6 +232,40 @@ if enviado:
     else:
         st.error(resultado["mensaje"])
 
+# --- Historial de glucosa (desplegable, justo debajo del formulario) ---
+
+with st.expander("Ver historial de registros de glucosa"):
+    df_glucosa = pd.DataFrame(st.session_state.registros_memoria)
+    df_editado = st.data_editor(
+        df_glucosa,
+        column_config={
+            "fecha": "Fecha",
+            "valor": st.column_config.NumberColumn("Valor (mg/dL)", format="%.2f")
+        },
+        num_rows="fixed",  # solo editar valores existentes, no borrar ni agregar filas
+        use_container_width=True,
+        key="editor_glucosa"
+    )
+
+if st.button("Guardar cambios de glucosa"):
+    registros_validados = []
+    hay_error = False
+    for i, fila in df_editado.iterrows():
+        resultado = logica.validar_glucosa(str(fila["valor"]))
+        if resultado["valido"]:
+            registros_validados.append({
+                "fecha": str(fila["fecha"]),
+                "valor": round(float(fila["valor"]), 2)
+            })
+        else:
+            st.error(f"Fila {i + 1}: {resultado['mensaje']}")
+            hay_error = True
+    
+    if not hay_error:
+            st.session_state.registros_memoria = registros_validados
+            st.success("Cambios guardados correctamente.")
+            st.rerun()
+
 
 # =========================================================================
 # PRESIÓN ARTERIAL — resumen + evolución (mismo patrón que glucosa)
@@ -261,6 +295,41 @@ linea_limite_presion = (
     .encode(y="limite:Q")
 )
 st.altair_chart(grafica_presion + linea_limite_presion, use_container_width=True)
+
+# --- Registrar nueva presión arterial ---
+
+st.subheader("Registrar presión arterial")
+
+with st.form("form_presion", clear_on_submit=True):
+    col_sis, col_dia = st.columns(2)
+    sistolica_nueva = col_sis.text_input("Sistólica (mmHg)")
+    diastolica_nueva = col_dia.text_input("Diastólica (mmHg)")
+    enviado_presion = st.form_submit_button("Registrar presión")
+
+if enviado_presion:
+    resultado = logica.validar_presion_arterial(sistolica_nueva, diastolica_nueva)
+    if resultado["valido"]:
+        nuevo_registro = {
+            "fecha": str(date.today()),
+            "sistolica": int(sistolica_nueva),
+            "diastolica": int(diastolica_nueva)
+        }
+        st.session_state.presion_memoria.append(nuevo_registro)
+        st.success(resultado["mensaje"])
+        st.rerun()
+    else:
+        st.error(resultado["mensaje"])
+
+with st.expander("Ver historial de presión arterial"):
+    presion_para_mostrar = []
+    for registro in st.session_state.presion_memoria:
+        presion_para_mostrar.append({
+            "fecha": registro["fecha"],
+            "sistólica (mmHg)": registro["sistolica"],
+            "diastólica (mmHg)": registro["diastolica"]
+        })
+    st.table(presion_para_mostrar)
+
  
 # =========================================================================
 # OXIGENACIÓN — resumen + evolución (mismo patrón, umbral hacia abajo)
@@ -292,26 +361,60 @@ linea_limite_oxi = (
 st.altair_chart(grafica_oxi + linea_limite_oxi, use_container_width=True)
 
 
-# --- SECCIÓN 5: Tabla de registros ---
-st.subheader("Historial de registros")
+# --- Registrar nueva oxigenación --- 
+st.subheader("Registrar oxigenación")
 
-# Creamos una versión "para mostrar" de los registros, con los valores
-# formateados a exactamente 2 decimales como texto. 
+with st.form("form_oxigenacion", clear_on_submit=True):
+    spo2_nuevo = st.text_input("Oxigenación (%)")
+    enviado_oxi = st.form_submit_button("Registrar oxigenación")
 
-#Recorremos la memoria con un for y armamos una lista nueva, sin 
-# modificar los datos originales guardados en session_state.
+if enviado_oxi:
+    resultado = logica.validar_oxigenacion(spo2_nuevo)
+    if resultado["valido"]:
+        nuevo_registro = {
+            "fecha": str(date.today()),
+            "valor": int(spo2_nuevo)
+        }
+        st.session_state.oxigenacion_memoria.append(nuevo_registro)
+        st.success(resultado["mensaje"])
+        st.rerun()
+    else:
+        st.error(resultado["mensaje"])
 
-registros_para_mostrar = []
-for registro in st.session_state.registros_memoria:
-    registros_para_mostrar.append({
-        "fecha": registro["fecha"],
-        "valor (mg/dL)": f"{registro["valor"]:.2f}"
-    })
+with st.expander("Ver historial de oxigenación"):
+    df_oxi = pd.DataFrame(st.session_state.oxigenacion_memoria)
+    df_oxi_editado = st.data_editor(
+        df_oxi,
+        column_config={
+            "fecha": "Fecha",
+            "valor": st.column_config.NumberColumn("SpO2 (%)")
+        },
+        num_rows="fixed",
+        use_container_width=True,
+        key="editor_oxigenacion"
+    )
 
-st.table(registros_para_mostrar)
+    if st.button("Guardar cambios de oxigenación"):
+        registros_validados = []
+        hay_error = False
+        for i, fila in df_oxi_editado.iterrows():
+            resultado = logica.validar_oxigenacion(fila["valor"])
+            if resultado["valido"]:
+                registros_validados.append({
+                    "fecha": str(fila["fecha"]),
+                    "valor": int(fila["valor"])
+                })
+            else:
+                st.error(f"Fila {i + 1}: {resultado['mensaje']}")
+                hay_error = True
+
+        if not hay_error:
+            st.session_state.oxigenacion_memoria = registros_validados
+            st.success("Cambios guardados correctamente.")
+            st.rerun()
 
 # =========================================================================
-# SECCIÓN 6: Registro de síntomas (adaptativo según semáforo)
+# SECCIÓN 5: Registro de síntomas (adaptativo según semáforo)
 # =========================================================================
 # El registro SIEMPRE está disponible — los síntomas pueden aparecer aunque
 # las métricas estén bien (mareo por otra causa, etc.). Lo que cambia es
@@ -394,14 +497,11 @@ else:
         formulario_sintomas()
 
 # --- Historial de síntomas reportados (siempre visible) ---
-st.subheader("Historial de síntomas")
-
-sintomas_para_mostrar = []
-for registro in st.session_state.sintomas_memoria:
-    sintomas_para_mostrar.append({
-        "Fecha": registro["fecha"],
-        "Síntomas Reportados": ", ".join(registro["sintomas"])
-    })
-
-st.table(sintomas_para_mostrar)
-
+with st.expander("Ver historial de síntomas"):
+    sintomas_para_mostrar = []
+    for registro in st.session_state.sintomas_memoria:
+        sintomas_para_mostrar.append({
+            "Fecha": registro["fecha"],
+            "Síntomas Reportados": ", ".join(registro["sintomas"])
+        })
+    st.table(sintomas_para_mostrar)
