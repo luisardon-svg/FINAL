@@ -32,6 +32,16 @@ st.markdown("""
 .badge-verde    { background-color: rgba(34,197,94,0.15); color: #22c55e; }
 .badge-rojo     { background-color: rgba(239,68,68,0.15); color: #ef4444; }
 .alerta-banner {
+.indicacion-doctor {
+    background-color: rgba(34,197,94,0.12); border-left: 4px solid #22c55e;
+    border-radius: 10px; padding: 14px 18px; color: #bbf7d0;
+    font-size: 14px; margin-bottom: 20px;
+}
+.indicacion-pendiente {
+    background-color: rgba(234,179,8,0.12); border-left: 4px solid #eab308;
+    border-radius: 10px; padding: 14px 18px; color: #fde68a;
+    font-size: 14px; margin-bottom: 20px;
+}
     background-color: rgba(153,27,27,0.55); border-radius: 10px;
     padding: 14px 18px; color: #fecaca; font-size: 14px; margin-bottom: 20px;
 }
@@ -135,6 +145,30 @@ if hay_alerta:
         🔔 {alerta}
     </div>
     """, unsafe_allow_html=True)
+
+# -----------------------------------------------------------------------
+# INDICACIÓN DEL DOCTOR — solo si la doctora la aprobó explícitamente
+# -----------------------------------------------------------------------
+# Leemos recomendacion_doctor de session_state (lo escribe el Panel Doctor).
+# El paciente solo ve la indicación cuando su estado es "aprobada".
+if "recomendacion_doctor" in st.session_state and st.session_state.recomendacion_doctor is not None:
+    recom = st.session_state.recomendacion_doctor
+
+    if recom["estado"] == "aprobada":
+        st.markdown(f"""
+        <div class="indicacion-doctor">
+            📋 <strong>Indicación de tu doctora:</strong><br>{recom["texto"]}
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif recom["estado"] == "pendiente":
+        st.markdown("""
+        <div class="indicacion-pendiente">
+            ⏳ Tu doctora está revisando una indicación para ti.
+        </div>
+        """, unsafe_allow_html=True)
+    # Si está "rechazada", no mostramos nada al paciente.
+
  
 
 # -----------------------------------------------------------------------
