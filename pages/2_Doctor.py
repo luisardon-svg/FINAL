@@ -125,6 +125,11 @@ grafica_final = grafica + limite
 st.altair_chart(grafica_final, use_container_width=True)
 st.caption(f"La linea roja marca el limite de {logica.GLUCOSA_LIMITE_ALTA} mg/dL. Las lecturas por encima disparan la alerta.")
 
+if "ALERTA" in alerta:
+    st.error(f"**{alerta}**")
+else: 
+    st.success(f"{alerta}")
+    
 
 
 #SECCION: Presion arterial
@@ -195,6 +200,12 @@ col2.metric("Mínimo", f"{minima_oxi} %")
 col3, col4 = st.columns(2)
 col3.metric("Tendencia", tendencia_oxi)
 col4.metric("Racha en alerta", f"{racha_oxi} días")
+
+#Alerta de oxigenación (mismo patrón que glucosa y presión)
+if "ALERTA" in alerta_oxi:
+    st.error(f"**{alerta_oxi}**")
+else:
+    st.success(alerta_oxi)
 
 #Gráfica de evolución, con línea naranja en el límite (92 - threshhold bajo)
 datos_oxi = []
