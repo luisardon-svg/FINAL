@@ -76,7 +76,7 @@ resumen = logica.generar_resumen_clinico(paciente, registros)
 st.text(resumen)
 
 # Métricas de glucosa
-st.subheader("Metricas de glucosa")
+st.subheader("Métricas de glucosa")
 
 racha = logica.calcular_racha_dias_alerta(registros)
 
