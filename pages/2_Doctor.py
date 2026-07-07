@@ -245,6 +245,44 @@ st.altair_chart(grafica_oxi + limite_oxi, use_container_width=True)
 
 st.divider()
 
+st.divider()
+
+# =========================================================================
+# SECCIÓN: Síntomas reportados por el paciente
+# =========================================================================
+# Leemos la misma memoria compartida que usa el Panel Paciente.
+# Si el paciente aún no ha abierto su panel, iniciamos con lo que ya
+# existe en pacientes_db (chequeos previos guardados como "otros_sintomas").
+if "sintomas_memoria" not in st.session_state:
+    st.session_state.sintomas_memoria = []
+    for sintoma_previo in paciente["otros_sintomas"]:
+        st.session_state.sintomas_memoria.append({
+            "fecha": "Previo",
+            "sintomas": [sintoma_previo]
+        })
+
+st.subheader("Síntomas reportados por el paciente")
+
+if len(st.session_state.sintomas_memoria) == 0:
+    st.info("El paciente no ha reportado síntomas.")
+else:
+    # Mostramos el más reciente destacado, y el resto en una tabla desplegable.
+    ultimo_registro = st.session_state.sintomas_memoria[-1]
+    st.warning(
+        f"**Último reporte ({ultimo_registro['fecha']}):** "
+        f"{', '.join(ultimo_registro['sintomas'])}"
+    )
+
+    with st.expander("Ver historial completo de síntomas"):
+        sintomas_para_mostrar = []
+        for registro in st.session_state.sintomas_memoria:
+            sintomas_para_mostrar.append({
+                "fecha": registro["fecha"],
+                "síntomas reportados": ", ".join(registro["sintomas"])
+            })
+        st.table(sintomas_para_mostrar)
+
+
 # =========================================================================
 # SECCIÓN: Análisis sugerido (tarjeta con botones Aprobar / Editar / Rechazar)
 # =========================================================================
