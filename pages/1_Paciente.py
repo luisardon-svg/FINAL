@@ -32,15 +32,19 @@ st.markdown("""
 .badge-verde    { background-color: rgba(34,197,94,0.15); color: #22c55e; }
 .badge-rojo     { background-color: rgba(239,68,68,0.15); color: #ef4444; }
 .alerta-banner {
+    background-color: rgba(153,27,27,0.55); border-radius: 10px;
+    padding: 14px 18px; color: #fecaca; font-size: 14px;
+    margin-bottom: 24px; line-height: 1.5;
+}
 .indicacion-doctor {
     background-color: rgba(34,197,94,0.12); border-left: 4px solid #22c55e;
-    border-radius: 10px; padding: 14px 18px; color: #bbf7d0;
-    font-size: 14px; margin-bottom: 20px;
+    border-radius: 10px; padding: 16px 20px; color: #bbf7d0;
+    font-size: 14px; margin-top: 8px; margin-bottom: 28px; line-height: 1.5;
 }
 .indicacion-pendiente {
     background-color: rgba(234,179,8,0.12); border-left: 4px solid #eab308;
-    border-radius: 10px; padding: 14px 18px; color: #fde68a;
-    font-size: 14px; margin-bottom: 20px;
+    border-radius: 10px; padding: 14px 20px; color: #fde68a;
+    font-size: 14px; margin-top: 8px; margin-bottom: 28px; line-height: 1.5;
 }
     background-color: rgba(153,27,27,0.55); border-radius: 10px;
     padding: 14px 18px; color: #fecaca; font-size: 14px; margin-bottom: 20px;
