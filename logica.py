@@ -460,6 +460,43 @@ def generar_resumen_clinico(datos_paciente, registros):
         f"Observación: {alerta}"
     )
     return resumen     
+
+# ---------------------------------------------------------------------
+# FUNCIÓN 16: generar la recomendación sugerida (para PR 5 - fase 7)
+# ---------------------------------------------------------------------
+def generar_recomendacion_sugerida(estado_semaforo, promedio_glucosa, tendencia_glucosa):
+    """
+    Genera una recomendación automática basada en el estado del semáforo.
+    Devuelve el diccionario recomendacion_doctor con estado inicial
+    "pendiente", listo para que el doctor lo apruebe, edite o rechace.
+    """
+    if estado_semaforo == "alerta":
+        texto = (
+            f"El paciente presenta niveles de glucosa elevados "
+            f"(promedio {promedio_glucosa} mg/dL, tendencia {tendencia_glucosa}). "
+            f"Se recomienda ajustar el tratamiento actual y agendar una consulta "
+            f"de seguimiento en los próximos 3 días."
+        )
+    elif estado_semaforo == "atencion":
+        texto = (
+            f"El paciente muestra valores en zona de atención "
+            f"(promedio {promedio_glucosa} mg/dL, tendencia {tendencia_glucosa}). "
+            f"Se recomienda reforzar el monitoreo y revisar hábitos alimenticios."
+        )
+    else:
+        texto = (
+            f"El paciente se encuentra estable "
+            f"(promedio {promedio_glucosa} mg/dL). "
+            f"Se recomienda mantener el plan actual y continuar el monitoreo regular."
+        )
+
+    return {
+        "texto": texto,
+        "estado": "pendiente",
+        "editado_por_doctor": False,
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+
 # ---------------------------------------------------------------------
 # BLOQUE DE PRUEBA POR CONSOLA
 # ---------------------------------------------------------------------

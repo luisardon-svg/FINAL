@@ -190,6 +190,108 @@ limite_oxi = alt.Chart(
 st.altair_chart(grafica_oxi + limite_oxi, use_container_width=True)
 
 st.divider()
+st.divider()
+
+# --- SECCION: Análisis sugerido (tarjeta con botones Aprobar/Editar/Rechazar) ---
+st.subheader("Análisis sugerido")
+
+# Generar la recomendación sugerida usando la función de logica.py
+recomendacion_sugerida = logica.generar_recomendacion_sugerida(
+    estado_semaforo=estado,
+    promedio_glucosa=promedio,
+    tendencia_glucosa=tendencia
+)
+
+# Mostrar la sugerencia del sistema en una tarjeta
+st.info(f"💡 **Sugerencia del sistema:** {recomendacion_sugerida['texto']}")
+
+# Si ya hay una recomendación pendiente/aprobada/rechazada, mostrar los botones
+if "recomendacion_doctor" not in st.session_state:
+    st.session_state.recomendacion_doctor = None
+
+if st.session_state.recomendacion_doctor is None:
+    # Primera vez: mostrar botones Aprobar / Editar / Rechazar
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("✅ Aprobar sugerencia"):
+            st.session_state.recomendacion_doctor = {
+                "texto": recomendacion_sugerida["texto"],
+                "estado": "aprobada",
+                "editado_por_doctor": False,
+                "fecha": recomendacion_sugerida["fecha"]
+            }
+            st.success("Sugerencia aprobada y enviada al paciente.")
+            st.rerun()
+    
+    with col2:
+        if st.button("✏️ Editar antes de aprobar"):
+            st.session_state.editando_recomendacion = True
+            st.rerun()
+    
+    with col3:
+        if st.button("❌ Rechazar sugerencia"):
+            st.session_state.recomendacion_doctor = {
+                "texto": recomendacion_sugerida["texto"],
+                "estado": "rechazada",
+                "editado_por_doctor": False,
+                "fecha": recomendacion_sugerida["fecha"]
+            }
+            st.info("Sugerencia rechazada. Puedes proponer una alternativa abajo.")
+            st.rerun()
+
+# Si está en modo edición
+elif st.session_state.get("editando_recomendacion", False):
+    st.warning("📝 Editando recomendación...")
+    texto_editado = st.text_area("Modifica la recomendación:", value=st.session_state.recomendacion_doctor["texto"])
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💾 Guardar cambios"):
+            st.session_state.recomendacion_doctor = {
+                "texto": texto_editado,
+                "estado": "pendiente",
+                "editado_por_doctor": True,
+                "fecha": st.session_state.recomendacion_doctor["fecha"]
+            }
+            st.session_state.editando_recomendacion = False
+            st.success("Cambios guardados. Ahora puedes aprobar la recomendación editada.")
+            st.rerun()
+    
+    with col2:
+        if st.button("❌ Cancelar edición"):
+            st.session_state.editando_recomendacion = False
+            st.rerun()
+
+# Si ya hay una recomendación guardada, mostrar su estado
+elif st.session_state.recomendacion_doctor is not None:
+    rec = st.session_state.recomendacion_doctor
+    
+    if rec["estado"] == "aprobada":
+        st.success(f"✅ **Aprobada:** {rec['texto']}")
+        if st.button("↩️ Reconsiderar"):
+            st.session_state.recomendacion_doctor = None
+            st.rerun()
+    
+    elif rec["estado"] == "rechazada":
+        st.error(f"❌ **Rechazada:** {rec['texto']}")
+        if st.button("↩️ Reconsiderar"):
+            st.session_state.recomendacion_doctor = None
+            st.rerun()
+    
+    elif rec["estado"] == "pendiente":
+        st.warning(f"⏳ **Pendiente de aprobación:** {rec['texto']}")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✅ Aprobar"):
+                st.session_state.recomendacion_doctor["estado"] = "aprobada"
+                st.success("Recomendación aprobada.")
+                st.rerun()
+        with col2:
+            if st.button("❌ Rechazar"):
+                st.session_state.recomendacion_doctor["estado"] = "rechazada"
+                st.info("Recomendación rechazada.")
+                st.rerun()
 #SECCION 5: decision de doctor
 #Refleja la decision final del profesional
 st.subheader("Decision del doctor")
