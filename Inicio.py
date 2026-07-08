@@ -9,6 +9,13 @@ st.set_page_config(page_title="Vital Health Monitor", page_icon="⚕️", layout
 st.title("Health Monitor ⚕️")
 st.write("Plataforma de seguimiento remoto de la salud")
 
+#Reencuadre etico
+st.info(
+    "⚕️ **El sistema sugiere, pero la decisión final siempre es del doctor.** "
+    "Nunca se automatiza la receta médica."
+)
+
+st.caption("Usa el menú de la izquierda para entrar al panel del paciente o del doctor.")
 st.divider()
 
 #CASO DE DEMOSTRACIÓN
@@ -73,12 +80,7 @@ else:
 
 st.divider()
 
-#Reencuadre etico
-st.info(
-    "⚕️ **El sistema sugiere, pero la decisión final siempre es del doctor.** "
-    "Nunca se automatiza la receta médica."
-)
-st.caption("Usa el menú de la izquierda para entrar al panel del paciente o del doctor.")
+
 
 st.divider()
 
