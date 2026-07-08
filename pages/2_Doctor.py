@@ -189,7 +189,7 @@ maxima_presion = logica.encontrar_presion_maxima(registros_presion)
 tendencia_presion = logica.detectar_tendencia_presion(registros_presion)
 alerta_presion = logica.generar_alerta_presion(registros_presion)
 
-st.subheader("Presion arterial")
+st.subheader("Presión arterial")
 
 racha_presion = logica.calcular_racha_dias_alerta_presion(registros_presion)
 
