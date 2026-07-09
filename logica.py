@@ -101,7 +101,7 @@ pacientes_db = {
 }
 
 # Rango de referencia para la glucosa en ayunas (valores orientativos).
-# Por encima de este límite consideramos que la glucosa
+# Por encima de este límite consideramos que la glucosa es elevada
 GLUCOSA_LIMITE_ALTA = 130
 
 # ---------------------------------------------------------------------
@@ -139,7 +139,7 @@ def encontrar_glucosa_maxima(registros):
     if len(registros) == 0:
         return 0
  
-    maxima = registros[0]["valor"]
+    maxima = registros[0]["valor"]   #Empieza en el primer valor 
     indice = 1
     # Ciclo while: recorremos la lista hasta llegar al final.
     while indice < len(registros):
@@ -165,7 +165,7 @@ def detectar_tendencia(registros):
         return "No hay suficientes datos para una tendencia"
  
     primero = registros[0]["valor"]
-    ultimo = registros[-1]["valor"]
+    ultimo = registros[-1]["valor"]  #Es -1 para tomar el último valor de la lista, ya que es una lista cerrada.
  
     # Condicional con if / elif / else: la decisión "de verdad".
     if ultimo > primero:
@@ -189,7 +189,7 @@ def generar_alerta(registros):
     Demuestra: parámetros, return, condicional, slicing de listas,
     y uso de otra función.
     """
-    registros_recientes = registros[-5:] #Slicing de listas
+    registros_recientes = registros[-5:] #Slicing de listas    # El [-5] acorta la lista a los últimos 5 datos
 
     promedio_reciente = calcular_promedio_glucosa(registros_recientes)
 
@@ -252,10 +252,10 @@ def validar_presion_arterial(sistolica, diastolica):
     Revisa una lectura de presión arterial.
     Devuelve un diccionario con "valido" (bool) y "mensaje" (str).
     """
-    try:
-        sistolica = int(sistolica)
+    try:                                  #Conversión segura a un número entero con try / except (la presión solo acepta números enteros)
+        sistolica = int(sistolica)  
         diastolica = int(diastolica)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError):         #Se conoce como "defensive programming" #Si el usuario mete algún dato erróneo que no sea un número, el sistema no truena
         return {"valido": False, "mensaje": "La presión arterial debe ser un número entero."}
     
     if sistolica <= diastolica:
@@ -328,15 +328,16 @@ def encontrar_presion_maxima(registros):
  
     Demuestra: parámetros, return, ciclo while, condicional, listas.
     """
-    if len(registros) == 0:
+    if len(registros) == 0:                          #Solo si el paciente no tiene registros
         return {"sistolica": 0, "diastolica": 0}
  
-    maximo = registros[0]
-    indice = 1
-    while indice < len(registros):
-        if registros[indice]["sistolica"] > maximo["sistolica"]:
+    maximo = registros[0]         #Asume que el primer registro es el máximo
+    indice = 1                     #Prepara un índice para recorrer desde el segundo registro
+
+    while indice < len(registros):                               #En cada vuelta compara la sistólica del registro actual contra la sistólica del "máximo" guardado hasta ahora
+        if registros[indice]["sistolica"] > maximo["sistolica"]:   #Si el actual es mayor, maximo se actualiza para apuntar a ese registro completo
             maximo = registros[indice]
-        indice = indice + 1
+        indice = indice + 1                                       #Avanza en el contador
  
     return maximo
  
